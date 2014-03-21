@@ -65,7 +65,7 @@
             });
 
             $('.tabs li').click(function() {
-                var contentGroup = $(this).parents('.content');
+                var contentGroup = $(this).closest('.tabs-wrapper');
 
                 $('.pane.selected', contentGroup).removeClass('selected');
                 $('.pane.' + $(this).data('pane'), contentGroup).addClass('selected');

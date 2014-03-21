@@ -144,6 +144,16 @@ class ApiDoc
      * @var string
      */
     private $responseBodyExample;
+    
+    /**
+     * @var array
+     */
+    private $requestDiscriminatorClasses;
+
+    /**
+     * @var array
+     */
+    private $responseDiscriminatorClasses;
 
     public function __construct(array $data)
     {
@@ -598,6 +608,38 @@ class ApiDoc
     }
 
     /**
+     * @param array $responseDiscriminatorClasses
+     */
+    public function setResponseDiscriminatorClasses($responseDiscriminatorClasses)
+    {
+        $this->responseDiscriminatorClasses = $responseDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponseDiscriminatorClasses()
+    {
+        return $this->responseDiscriminatorClasses;
+    }
+
+    /**
+     * @param array $requestDiscriminatorClasses
+     */
+    public function setRequestDiscriminatorClasses($requestDiscriminatorClasses)
+    {
+        $this->requestDiscriminatorClasses = $requestDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestDiscriminatorClasses()
+    {
+        return $this->requestDiscriminatorClasses;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
@@ -649,6 +691,14 @@ class ApiDoc
 
         if ($cache = $this->cache) {
             $data['cache'] = $cache;
+        }
+
+        if ($requestDiscriminatorClasses = $this->requestDiscriminatorClasses) {
+            $data['requestDiscriminatorClasses'] = $requestDiscriminatorClasses;
+        }
+
+        if ($responseDiscriminatorClasses = $this->responseDiscriminatorClasses) {
+            $data['responseDiscriminatorClasses'] = $responseDiscriminatorClasses;
         }
 
         if ($requestBodyExample = $this->requestBodyExample) {
