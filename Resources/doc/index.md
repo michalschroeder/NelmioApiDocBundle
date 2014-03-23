@@ -406,6 +406,15 @@ You can specify your own API name:
     nelmio_api_doc:
         name: My API
 
+You can specify if using parsers compute the intersection of arrays using keys for comparison.
+
+If you setup to `true` then if one of the parsers exclude property of an object, it will be excluded even if next parser doesn't exclude.
+If you setup to `false` then if one of the parsers exclude property of an object, it will not be excluded even if next parser doesn't exclude.
+
+    # app/config/config.yml
+    nelmio_api_doc:
+        parsers_merge_parameters_intersect_key: true
+
 You can specify which sections to exclude from the documentation generation:
 
     # app/config/config.yml
@@ -453,6 +462,7 @@ Look at the built-in [Handlers](https://github.com/nelmio/NelmioApiDocBundle/tre
 ``` yaml
 nelmio_api_doc:
     name:                     API documentation
+    parsers_merge_parameters_intersect_key: false
     exclude_sections:         []
     motd:
         template:             NelmioApiDocBundle::Components/motd.html.twig
