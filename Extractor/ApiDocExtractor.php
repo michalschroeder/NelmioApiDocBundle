@@ -56,6 +56,11 @@ class ApiDocExtractor
      */
     protected $handlers;
 
+    /**
+     * @var boolean
+     */
+    protected $intersectKey;
+
     public function __construct(ContainerInterface $container, RouterInterface $router, Reader $reader, DocCommentExtractor $commentExtractor, array $handlers)
     {
         $this->container        = $container;
@@ -63,6 +68,17 @@ class ApiDocExtractor
         $this->reader           = $reader;
         $this->commentExtractor = $commentExtractor;
         $this->handlers         = $handlers;
+        $this->setIntersectKey(
+            $this->container->getParameter('nelmio_api_doc.parsers_merge_parameters_intersect_key')
+        );
+    }
+
+    /**
+     * @param boolean $intersectKey
+     */
+    public function setIntersectKey($intersectKey)
+    {
+        $this->intersectKey = $intersectKey;
     }
 
     /**
@@ -381,6 +397,8 @@ class ApiDocExtractor
      */
     protected function mergeParameters($p1, $p2)
     {
+        $p1 = $this->parersMergeParametersIntersectKey($p1, $p2);
+
         $params = $p1;
 
         foreach ($p2 as $propname => $propvalue) {
@@ -470,5 +488,24 @@ class ApiDocExtractor
         }
 
         return $parsers;
+    }
+
+    /**
+     * @param array $p1
+     * @param array $p2
+     *
+     * @return array
+     */
+    protected function parersMergeParametersIntersectKey($p1, $p2)
+    {
+        if (!$this->intersectKey) {
+            return $p1;
+        }
+
+        if (!empty($p1) && !empty($p2)) {
+            return array_intersect_key($p1, $p2);
+        }
+
+        return $p1;
     }
 }

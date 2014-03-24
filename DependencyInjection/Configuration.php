@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
             ->root('nelmio_api_doc')
             ->children()
                 ->scalarNode('name')->defaultValue('API documentation')->end()
+                ->booleanNode('parsers_merge_parameters_intersect_key')->defaultFalse()->end()
                 ->arrayNode('exclude_sections')
                     ->prototype('scalar')
                     ->end()
