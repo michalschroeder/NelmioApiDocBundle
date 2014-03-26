@@ -330,11 +330,27 @@ class ApiDoc
     }
 
     /**
+     * @param array $groups
+     */
+    public function setInputGroups(array $groups)
+    {
+        $this->input['groups'] = $groups;
+    }
+
+    /**
      * @return string|null
      */
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * @param array $groups
+     */
+    public function setOutputGroups(array $groups)
+    {
+        $this->output['groups'] = $groups;
     }
 
     /**
