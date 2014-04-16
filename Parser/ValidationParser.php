@@ -114,15 +114,18 @@ class ValidationParser implements ParserInterface, PostParserInterface
                     $parameters[$param]['children'], $this->postParse($input, $parameters[$param]['children'])
                 );
                 $parameters[$param]['children'] = array_merge(
-                    $parameters[$param]['children'], $this->parse($input, $parameters[$param]['children'])
+                    $parameters[$param]['children'], $this->parse($input)
                 );
             } else if (!empty($data['discriminatorClass'])) {
                 $input = array('class' => $param);
-                $parameters[$param]['discriminatorClass'] = array_merge(
-                    $parameters[$param]['discriminatorClass'], $this->postParse($input, $parameters[$param]['discriminatorClass'])
+
+                $parse = array_intersect_key(
+                    $this->parse($input),
+                    $parameters[$param]['discriminatorClass']
                 );
+
                 $parameters[$param]['discriminatorClass'] = array_merge(
-                    $parameters[$param]['discriminatorClass'], $this->parse($input, $parameters[$param]['discriminatorClass'])
+                    $parameters[$param]['discriminatorClass'], $parse
                 );
             }
         }
