@@ -574,10 +574,6 @@ form .request-content {
     margin-bottom: 10px;
 }
 
-.motd {
-  padding:20px;
-}
-
 input.search {
     border: 1px solid #628704;
     font-size: 1.3em;
@@ -589,5 +585,9 @@ input.search {
     -moz-box-shadow: inset 0 0 8px #888;
     -webkit-box-shadow: inset 0 0 8px #888;
     box-shadow: inner 0 0 8px #888;
+}
+
+.motd {
+  padding:20px;
 }
 
