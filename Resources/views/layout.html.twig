@@ -40,7 +40,8 @@
         </div>
         {% include motdTemplate %}
         <div class="container" id="resources_container">
-            <ul id="resources">
+            <input type="text" class="search" placeholder="Search" />
+            <ul id="resources" class="list">
                 {% block content %}{% endblock %}
             </ul>
         </div>
@@ -48,6 +49,11 @@
             Documentation auto-generated on {{ date }}
         </p>
         <script type="text/javascript">
+
+            var options = {
+                valueNames : [ "heading", "options" ]
+            };
+            var userList = new List("resources_container", options);
 
             $(window).load(function() {
                 var id = (window.location.hash || '').substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
