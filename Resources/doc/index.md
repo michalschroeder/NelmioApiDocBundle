@@ -130,6 +130,8 @@ The following properties are available:
 
 * `filters`: an array of filters;
 
+* `headers`: an array of headers;
+
 * `requirements`: an array of requirements;
 
 * `parameters`: an array of parameters;
@@ -216,6 +218,9 @@ class YourController
  string value or array with `file` key and path value to example with the response. See examples above.
 
 Each _filter_ has to define a `name` parameter, but other parameters are free. Filters are often optional
+parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
+
+Each _header_ has to define a `name` parameter, but other parameters are free. Headers are often optional
 parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
 
 If you set `input`, then the bundle automatically extracts parameters based on the given type,

@@ -80,6 +80,35 @@
                 </table>
             {% endif %}
 
+            {% if data.headers is defined and data.headers is not empty %}
+                <h4>Headers</h4>
+                <table class="fullwidth">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Information</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for name, infos in data.headers %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>
+                                <table>
+                                    {% for key, value in infos %}
+                                        <tr>
+                                            <td>{{ key|title }}</td>
+                                            <td>{{ value|json_encode|replace({'\\\\': '\\'})|trim('"') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
             {% if data.filters is defined and data.filters is not empty %}
                 <h4>Filters</h4>
                 <table class="fullwidth">
@@ -217,6 +246,16 @@
                                 {% if data.requirements is defined %}
                                     <h4>Requirements</h4>
                                     {% for name, infos in data.requirements %}
+                                        <p class="tuple">
+                                            <input type="text" class="key" value="{{ name }}" placeholder="Key" />
+                                            <span>=</span>
+                                            <input type="text" class="value" placeholder="{% if infos.description is defined %}{{ infos.description }}{% else %}Value{% endif %}" {% if infos.default is defined %} value="{{ infos.default }}" {% endif %}/> <span class="remove">-</span>
+                                        </p>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if data.headers is defined %}
+                                    <h4>Headers</h4>
+                                    {% for name, infos in data.headers %}
                                         <p class="tuple">
                                             <input type="text" class="key" value="{{ name }}" placeholder="Key" />
                                             <span>=</span>

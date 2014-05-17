@@ -73,6 +73,7 @@ class ApiDocExtractorTest extends WebTestCase
         $this->assertFalse($a2->isResource());
         $this->assertEquals('create test', $a2->getDescription());
         $this->assertFalse(isset($array2['filters']));
+        $this->assertFalse(isset($array2['headers']));
         $this->assertEquals('Nelmio\ApiDocBundle\Tests\Fixtures\Form\TestType', $a2->getInput());
 
         $a2 = $data[5]['annotation'];
