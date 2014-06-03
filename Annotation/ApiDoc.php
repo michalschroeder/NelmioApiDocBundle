@@ -155,6 +155,11 @@ class ApiDoc
      */
     private $responseDiscriminatorClasses;
 
+    /**
+     * @var array
+     */
+    private $headers;
+
     public function __construct(array $data)
     {
         $this->resource = !empty($data['resource']) ? $data['resource'] : false;
@@ -175,6 +180,19 @@ class ApiDoc
                 unset($filter['name']);
 
                 $this->addFilter($name, $filter);
+            }
+        }
+
+        if (isset($data['headers'])) {
+            foreach ($data['headers'] as $header) {
+                if (!isset($header['name'])) {
+                    throw new \InvalidArgumentException('A "headers" element has to contain a "name" attribute');
+                }
+
+                $name = $header['name'];
+                unset($header['name']);
+
+                $this->addHeader($name, $header);
             }
         }
 
@@ -685,6 +703,10 @@ class ApiDoc
             $data['filters'] = $filters;
         }
 
+        if ($headers = $this->headers) {
+            $data['headers'] = $headers;
+        }
+
         if ($parameters = $this->parameters) {
             $data['parameters'] = $parameters;
         }
@@ -757,5 +779,22 @@ class ApiDoc
     private function markdownBlockCodeFormater($code)
     {
         return !empty($code) ? "```\n" . $code . "\n```" : "";
+    }
+
+    /**
+     * @param string $name
+     * @param array  $header
+     */
+    public function addHeader($name, array $header)
+    {
+        $this->headers[$name] = $header;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
     }
 }

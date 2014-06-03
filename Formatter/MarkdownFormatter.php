@@ -74,6 +74,20 @@ class MarkdownFormatter extends AbstractFormatter
             }
         }
 
+        if (isset($data['headers'])) {
+            $markdown .= "#### Headers ####\n\n";
+
+            foreach ($data['headers'] as $name => $header) {
+                $markdown .= sprintf("%s:\n\n", $name);
+
+                foreach ($header as $key => $value) {
+                    $markdown .= sprintf("  * %s: %s\n", ucwords($key), trim(str_replace('\\\\', '\\', json_encode($value)), '"'));
+                }
+
+                $markdown .= "\n";
+            }
+        }
+
         if (!empty($data['requestDiscriminatorClasses'])) {
             $markdown .= "#### Parameters ####\n\n";
 

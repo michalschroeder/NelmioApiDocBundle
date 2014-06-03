@@ -25,6 +25,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertFalse($annot->isResource());
         $this->assertFalse($annot->getDeprecated());
         $this->assertFalse(isset($array['description']));
@@ -47,6 +48,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertFalse($annot->isResource());
         $this->assertFalse($annot->getDeprecated());
         $this->assertFalse(isset($array['description']));
@@ -66,6 +68,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertFalse($annot->isResource());
         $this->assertFalse($annot->getDeprecated());
         $this->assertEquals($data['description'], $array['description']);
@@ -86,6 +89,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertFalse($annot->isResource());
         $this->assertFalse($annot->getDeprecated());
         $this->assertEquals($data['description'], $array['description']);
@@ -108,6 +112,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertTrue($annot->isResource());
         $this->assertTrue($annot->getDeprecated());
         $this->assertEquals($data['description'], $array['description']);
@@ -130,6 +135,7 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertFalse(isset($array['headers']));
         $this->assertFalse($annot->isResource());
         $this->assertEquals($data['description'], $array['description']);
         $this->assertFalse(isset($array['requirements']));
@@ -164,6 +170,32 @@ class ApiDocTest extends TestCase
         $this->assertNull($annot->getInput());
     }
 
+    public function testConstructMethodHasHeaders()
+    {
+        $data = array(
+            'resource'      => true,
+            'deprecated'    => false,
+            'description'   => 'Heya',
+            'headers'       => array(
+                array('name' => 'a-filter'),
+            ),
+        );
+
+        $annot = new ApiDoc($data);
+        $array = $annot->toArray();
+
+        $this->assertTrue(is_array($array));
+        $this->assertTrue(is_array($array['headers']));
+        $this->assertCount(1, $array['headers']);
+        $this->assertEquals(array('a-filter' => array()), $array['headers']);
+        $this->assertTrue($annot->isResource());
+        $this->assertEquals($data['description'], $array['description']);
+        $this->assertFalse(isset($array['requirements']));
+        $this->assertFalse(isset($array['parameters']));
+        $this->assertEquals($data['deprecated'], $array['deprecated']);
+        $this->assertNull($annot->getInput());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -178,6 +210,21 @@ class ApiDocTest extends TestCase
 
         $annot = new ApiDoc($data);
     }
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConstructMethodHasHeadersWithoutName()
+    {
+        $data = array(
+            'description'   => 'Heya',
+            'headers'       => array(
+                array('parameter' => 'foo'),
+            ),
+        );
+
+        $annot = new ApiDoc($data);
+    }
+
 
     public function testConstructNoFiltersIfFormTypeDefined()
     {
@@ -195,6 +242,27 @@ class ApiDocTest extends TestCase
 
         $this->assertTrue(is_array($array));
         $this->assertFalse(isset($array['filters']));
+        $this->assertTrue($annot->isResource());
+        $this->assertEquals($data['description'], $array['description']);
+        $this->assertEquals($data['input'], $annot->getInput());
+    }
+
+    public function testConstructNoHeadersIfFormTypeDefined()
+    {
+        $data = array(
+            'resource'      => true,
+            'description'   => 'Heya',
+            'input'         => 'My\Form\Type',
+            'headers'       => array(
+                array('name' => 'a-filter'),
+            ),
+        );
+
+        $annot = new ApiDoc($data);
+        $array = $annot->toArray();
+
+        $this->assertTrue(is_array($array));
+        $this->assertTrue(isset($array['headers']));
         $this->assertTrue($annot->isResource());
         $this->assertEquals($data['description'], $array['description']);
         $this->assertEquals($data['input'], $annot->getInput());
