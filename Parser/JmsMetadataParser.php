@@ -146,17 +146,10 @@ class JmsMetadataParser implements ParserInterface
         }
 
         if ($this->shouldReadDiscriminatorClasses($meta)) {
-            $discriminatorFieldName = $meta->discriminatorFieldName;
-
-            foreach ($meta->discriminatorMap as $discriminatorFieldValue => $discriminatorClass) {
+            foreach ($meta->discriminatorMap as $discriminatorClass) {
                 $visited[] = $discriminatorClass;
 
                 $discriminatorClassProperties = $this->doParse($discriminatorClass, $visited, $groups);
-                $discriminatorClassProperties = $this->addDiscriminatorField(
-                    $discriminatorClassProperties,
-                    $discriminatorFieldName,
-                    $discriminatorFieldValue
-                );
 
                 $properties[$discriminatorClass] = array(
                     'dataType'           => 'discriminatorClass',
@@ -167,27 +160,6 @@ class JmsMetadataParser implements ParserInterface
         }
 
         return $properties;
-    }
-
-    /**
-     * @param array $discriminatorClassProperties
-     * @param string $discriminatorFieldName
-     * @param string $discriminatorFieldValue
-     * @return array
-     */
-    private function addDiscriminatorField($discriminatorClassProperties, $discriminatorFieldName, $discriminatorFieldValue)
-    {
-        $discriminatorClassProperties[$discriminatorFieldName] = array(
-            'dataType'     => 'string',
-            'required'     => true,
-            'readonly'     => false,
-            'format'       => null,
-            'description'  => $discriminatorFieldName . ' = ' . $discriminatorFieldValue,
-            'sinceVersion' => null,
-            'untilVersion' => null,
-        );
-
-        return $discriminatorClassProperties;
     }
 
     /**

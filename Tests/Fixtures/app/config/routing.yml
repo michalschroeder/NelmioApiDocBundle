@@ -149,7 +149,7 @@ test_route_private:
 test_route_exclusive:
     pattern: /exclusive
     defaults: { _controller: NelmioApiDocTestBundle:Test:exclusive }
-
+    
 test_route_response_with_discriminator:
     pattern: /discriminators
     defaults: { _controller: NelmioApiDocTestBundle:Test:responseWithDiscriminatorClasses }
@@ -161,3 +161,9 @@ test_route_request_with_discriminator:
     defaults: { _controller: NelmioApiDocTestBundle:Test:requestWithDiscriminatorClasses }
     requirements:
         _method: POST
+
+test_route_21:
+    pattern:  /z-action-with-constraint-requirements
+    defaults: { _controller: NelmioApiDocTestBundle:Test:zActionWithConstraintAsRequirements }
+    requirements:
+        _method: GET

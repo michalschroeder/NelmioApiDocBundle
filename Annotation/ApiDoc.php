@@ -136,6 +136,11 @@ class ApiDoc
     private $statusCodes = array();
 
     /**
+     * @var array
+     */
+    private $tags = array();
+    
+    /**
      * @var string
      */
     private $requestBodyExample;
@@ -260,6 +265,16 @@ class ApiDoc
         if (isset($data['deprecated'])) {
             $this->deprecated = $data['deprecated'];
         }
+
+		if (isset($data['tags'])) {
+			$tags = $data['tags'];
+
+			if (!is_array($tags)) {
+				$tags = array($tags);
+		   	}
+
+		    $this->tags = $tags;
+		}
 
         if (isset($data['https'])) {
             $this->https = $data['https'];
@@ -598,6 +613,14 @@ class ApiDoc
     {
         return $this->requirements;
     }
+    
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
 
     /**
      * @param string $responseBodyExample
@@ -729,6 +752,10 @@ class ApiDoc
 
         if ($cache = $this->cache) {
             $data['cache'] = $cache;
+        }
+
+        if ($tags = $this->tags) {
+            $data['tags'] = $tags;
         }
 
         if ($requestDiscriminatorClasses = $this->requestDiscriminatorClasses) {

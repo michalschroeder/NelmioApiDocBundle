@@ -15,27 +15,30 @@
     <body>
         <div id="header">
             <a href="{{ path('nelmio_api_doc_index') }}"><h1>{{ apiName }}</h1></a>
-            <div id="sandbox_configuration">
-                body format:
-                <select id="body_format">
-                    <option value="x-www-form-urlencoded"{{ bodyFormat == 'form' ? ' selected' : '' }}>Form Data</option>
-                    <option value="json"{{ bodyFormat == 'json' ? ' selected' : '' }}>JSON</option>
-                </select>
-                request format:
-                <select id="request_format">
-                    <option value="json"{{ defaultRequestFormat == 'json' ? ' selected' : '' }}>JSON</option>
-                    <option value="xml"{{ defaultRequestFormat == 'xml' ? ' selected' : '' }}>XML</option>
-                </select>
-                {% if authentication and authentication.delivery in ['query', 'http_basic', 'header'] %}
-                    api key: <input type="text" id="api_key" value=""/>
-                {% endif %}
-                {% if authentication and authentication.delivery in ['http_basic'] %}
-                    api pass: <input type="text" id="api_pass" value=""/>
-                {% endif %}
-                {% if authentication and authentication.custom_endpoint %}
-                    api endpoint: <input type="text" id="api_endpoint" value=""/>
-                {% endif %}
-            </div>
+            {% if enableSandbox %}
+                <div id="sandbox_configuration">
+                    body format:
+                    <select id="body_format">
+                        <option value="x-www-form-urlencoded"{{ bodyFormat == 'form' ? ' selected' : '' }}>Form Data</option>
+                        <option value="json"{{ bodyFormat == 'json' ? ' selected' : '' }}>JSON</option>
+                    </select>
+                    request format:
+                    <select id="request_format">
+                    {% for format, header in requestFormats %}
+                        <option value="{{ header }}"{{ defaultRequestFormat == format ? ' selected' : '' }}>{{ format }}</option>
+                    {% endfor %}
+                    </select>
+                    {% if authentication and authentication.delivery in ['query', 'http_basic', 'header'] %}
+                        api key: <input type="text" id="api_key" value=""/>
+                    {% endif %}
+                    {% if authentication and authentication.delivery in ['http_basic'] %}
+                        api pass: <input type="text" id="api_pass" value=""/>
+                    {% endif %}
+                    {% if authentication and authentication.custom_endpoint %}
+                        api endpoint: <input type="text" id="api_endpoint" value=""/>
+                    {% endif %}
+                </div>
+            {% endif %}
             <br style="clear: both;" />
         </div>
         {% include motdTemplate %}
@@ -49,14 +52,38 @@
             Documentation auto-generated on {{ date }}
         </p>
         <script type="text/javascript">
-
+        
             var options = {
                 valueNames : [ "heading", "options" ]
             };
             var userList = new List("resources_container", options);
 
+            var getHash = function() {
+              return window.location.hash || '';
+            };
+
+            var setHash = function(hash) {
+                window.location.hash = hash;
+            };
+
+            var clearHash = function() {
+                var scrollTop, scrollLeft;
+
+                if(typeof history === 'object' && typeof history.pushState === 'function') {
+                    history.replaceState('', document.title, window.location.pathname + window.location.search);
+                } else {
+                    scrollTop = document.body.scrollTop;
+                    scrollLeft = document.body.scrollLeft;
+
+                    setHash('');
+
+                    document.body.scrollTop = scrollTop;
+                    document.body.scrollLeft = scrollLeft;
+                }
+            };
+
             $(window).load(function() {
-                var id = (window.location.hash || '').substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
+                var id = getHash().substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
                 var elem = $('#' + id);
                 if (elem.length) {
                     setTimeout(function() {
@@ -66,8 +93,17 @@
                 }
             });
 
-            $('.toggler').click(function() {
-                $(this).next().slideToggle('fast');
+            $('.toggler').click(function(event) {
+                var contentContainer = $(this).next();
+
+                if(contentContainer.is(':visible')) {
+                    clearHash();
+                } else {
+                    setHash($(this).attr('href'));
+                }
+
+                contentContainer.slideToggle('fast');
+                return false;
             });
 
             $('.tabs li').click(function() {
@@ -201,13 +237,12 @@
                         method = method.split('|').sort().pop();
                     }
 
-                    // set default requestFormat
-                    var requestFormat = $('#request_format').val();
+                    // set requestFormat
                     var requestFormatMethod = '{{ requestFormatMethod }}';
                     if (requestFormatMethod == 'format_param') {
-                        params['_format'] = requestFormat;
+                        params['_format'] = $('#request_format option:selected').text();
                     } else if (requestFormatMethod == 'accept_header') {
-                        headers['Accept'] = 'application/' + requestFormat;
+                        headers['Accept'] = $('#request_format').val();
                     }
 
                     // set default bodyFormat
