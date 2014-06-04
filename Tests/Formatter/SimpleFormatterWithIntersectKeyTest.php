@@ -64,15 +64,6 @@ class SimpleFormatterWithIntersectKeyTest extends SimpleFormatterTest
                                         'sinceVersion' => null,
                                         'untilVersion' => null,
                                     ),
-                                    'type' => array(
-                                        'dataType' => 'string',
-                                        'required' => true,
-                                        'description' => 'type = type1',
-                                        'readonly' => false,
-                                        'format' => null,
-                                        'sinceVersion' => null,
-                                        'untilVersion' => null,
-                                    )
                                 )
                         ),
                     'https' => false,
@@ -116,15 +107,6 @@ class SimpleFormatterWithIntersectKeyTest extends SimpleFormatterTest
                                         'sinceVersion' => null,
                                         'untilVersion' => null,
                                     ),
-                                    'type' => array(
-                                        'dataType' => 'string',
-                                        'required' => true,
-                                        'description' => 'type = type1',
-                                        'readonly' => false,
-                                        'format' => null,
-                                        'sinceVersion' => null,
-                                        'untilVersion' => null,
-                                    )
                                 )
                         ),
                     'https' => false,
