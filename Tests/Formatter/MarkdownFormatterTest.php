@@ -44,11 +44,6 @@ bar:
 
   * type: string
 
-type:
-
-  * type: string
-  * description: type = type1
-
 
 ### `POST` /discriminators ###
 
@@ -67,12 +62,6 @@ bar:
 
   * type: string
   * required: false
-
-type:
-
-  * type: string
-  * required: true
-  * description: type = type1
 
 
 ## /tests ##
