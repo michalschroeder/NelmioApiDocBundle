@@ -13,14 +13,14 @@ namespace Nelmio\ApiDocBundle\Tests\Formatter;
 
 use Nelmio\ApiDocBundle\Tests\WebTestCase;
 
-class SimpleFormatterTest extends WebTestCase
+class SimpleFormatterWithIntersectKeyTest extends SimpleFormatterTest
 {
     public function testFormat()
     {
         $container = $this->getContainer();
-
         $extractor = $container->get('nelmio_api_doc.extractor.api_doc_extractor');
         set_error_handler(array($this, 'handleDeprecation'));
+        $extractor->setIntersectKey(true);
         $data      = $extractor->all();
         restore_error_handler();
         $result    = $container->get('nelmio_api_doc.formatter.simple_formatter')->format($data);
@@ -28,25 +28,12 @@ class SimpleFormatterTest extends WebTestCase
         $expected = array(
             '/discriminators' =>
             array(
-                0 =>
+            0 =>
                 array(
                     'method' => 'GET',
                     'uri' => '/discriminators',
                     'description' => 'Action with discriminator class in response',
                     'response' =>
-                    array(
-                        'foo' => array(
-                            'dataType' => 'string',
-                            'required' => false,
-                            'description' => null,
-                            'readonly' => false,
-                            'sinceVersion' => null,
-                            'untilVersion' => null,
-                        ),
-                    ),
-                    'responseDiscriminatorClasses' =>
-                    array(
-                        'DiscriminatorClass' =>
                         array(
                             'foo' => array(
                                 'dataType' => 'string',
@@ -56,49 +43,49 @@ class SimpleFormatterTest extends WebTestCase
                                 'sinceVersion' => null,
                                 'untilVersion' => null,
                             ),
-                            'bar' => array(
-                                'dataType' => 'string',
-                                'required' => false,
-                                'description' => null,
-                                'readonly' => false,
-                                'sinceVersion' => null,
-                                'untilVersion' => null,
-                            ),
-                            'type' => array(
-                                'dataType' => 'string',
-                                'required' => true,
-                                'description' => 'type = type1',
-                                'readonly' => false,
-                                'format' => null,
-                                'sinceVersion' => null,
-                                'untilVersion' => null,
-                            )
-                        )
-                    ),
+                        ),
+                    'responseDiscriminatorClasses' =>
+                        array(
+                            'DiscriminatorClass' =>
+                                array(
+                                    'foo' => array(
+                                        'dataType' => 'string',
+                                        'required' => false,
+                                        'description' => null,
+                                        'readonly' => false,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    ),
+                                    'bar' => array(
+                                        'dataType' => 'string',
+                                        'required' => false,
+                                        'description' => null,
+                                        'readonly' => false,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    ),
+                                    'type' => array(
+                                        'dataType' => 'string',
+                                        'required' => true,
+                                        'description' => 'type = type1',
+                                        'readonly' => false,
+                                        'format' => null,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    )
+                                )
+                        ),
                     'https' => false,
                     'authentication' => false,
                     'authenticationRoles' => array(),
                     'deprecated' => false,
                 ),
-                1 =>
+            1 =>
                 array(
                     'method' => 'POST',
                     'uri' => '/discriminators',
                     'description' => 'Action with discriminator class in request params',
                     'parameters' =>
-                    array(
-                        'foo' => array(
-                            'dataType' => 'string',
-                            'required' => false,
-                            'description' => null,
-                            'readonly' => false,
-                            'sinceVersion' => null,
-                            'untilVersion' => null,
-                        ),
-                    ),
-                    'requestDiscriminatorClasses' =>
-                    array(
-                        'DiscriminatorClass' =>
                         array(
                             'foo' => array(
                                 'dataType' => 'string',
@@ -108,25 +95,38 @@ class SimpleFormatterTest extends WebTestCase
                                 'sinceVersion' => null,
                                 'untilVersion' => null,
                             ),
-                            'bar' => array(
-                                'dataType' => 'string',
-                                'required' => false,
-                                'description' => null,
-                                'readonly' => false,
-                                'sinceVersion' => null,
-                                'untilVersion' => null,
-                            ),
-                            'type' => array(
-                                'dataType' => 'string',
-                                'required' => true,
-                                'description' => 'type = type1',
-                                'readonly' => false,
-                                'format' => null,
-                                'sinceVersion' => null,
-                                'untilVersion' => null,
-                            )
-                        )
-                    ),
+                        ),
+                    'requestDiscriminatorClasses' =>
+                        array(
+                            'DiscriminatorClass' =>
+                                array(
+                                    'foo' => array(
+                                        'dataType' => 'string',
+                                        'required' => false,
+                                        'description' => null,
+                                        'readonly' => false,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    ),
+                                    'bar' => array(
+                                        'dataType' => 'string',
+                                        'required' => false,
+                                        'description' => null,
+                                        'readonly' => false,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    ),
+                                    'type' => array(
+                                        'dataType' => 'string',
+                                        'required' => true,
+                                        'description' => 'type = type1',
+                                        'readonly' => false,
+                                        'format' => null,
+                                        'sinceVersion' => null,
+                                        'untilVersion' => null,
+                                    )
+                                )
+                        ),
                     'https' => false,
                     'authentication' => false,
                     'authenticationRoles' => array(),
@@ -926,11 +926,6 @@ With multiple lines.',
                     'authentication' => false,
                     'deprecated' => false,
                     'response' => array (
-                        'bar' => array(
-                            'dataType' => 'DateTime',
-                            'required' => null,
-                            'readonly' => null
-                        ),
                         'number' => array(
                             'dataType' => 'DateTime',
                             'required' => false,
@@ -938,24 +933,6 @@ With multiple lines.',
                             'readonly' => false,
                             'sinceVersion' => null,
                             'untilVersion' => null
-                        ),
-                        'objects' => array(
-                            'dataType' => 'array of objects (Test)',
-                            'readonly' => null,
-                            'required' => null,
-                            'children' => array(
-                                'a' => array(
-                                    'dataType' => 'string',
-                                    'format' => '{length: min: foo}, {not blank}',
-                                    'required' => true,
-                                    'readonly' => null
-                                ),
-                                'b' => array(
-                                    'dataType' => 'DateTime',
-                                    'required' => null,
-                                    'readonly' => null
-                                )
-                            )
                         )
                     ),
                     'authenticationRoles' => array(),
@@ -998,11 +975,6 @@ With multiple lines.',
                     'authentication' => false,
                     'deprecated' => false,
                     'response' => array (
-                        'bar' => array(
-                            'dataType' => 'DateTime',
-                            'required' => null,
-                            'readonly' => null
-                        ),
                         'number' => array(
                             'dataType' => 'DateTime',
                             'required' => false,
@@ -1011,24 +983,6 @@ With multiple lines.',
                             'sinceVersion' => null,
                             'untilVersion' => null
                         ),
-                        'objects' => array(
-                            'dataType' => 'array of objects (Test)',
-                            'readonly' => null,
-                            'required' => null,
-                            'children' => array(
-                                'a' => array(
-                                    'dataType' => 'string',
-                                    'format' => '{length: min: foo}, {not blank}',
-                                    'required' => true,
-                                    'readonly' => null
-                                ),
-                                'b' => array(
-                                    'dataType' => 'DateTime',
-                                    'required' => null,
-                                    'readonly' => null
-                                )
-                            )
-                        )
                     ),
                     'authenticationRoles' => array(),
                 )

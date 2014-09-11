@@ -56,6 +56,11 @@ class ApiDocExtractor
      */
     protected $handlers;
 
+    /**
+     * @var boolean
+     */
+    protected $intersectKey;
+
     public function __construct(ContainerInterface $container, RouterInterface $router, Reader $reader, DocCommentExtractor $commentExtractor, array $handlers)
     {
         $this->container        = $container;
@@ -63,6 +68,17 @@ class ApiDocExtractor
         $this->reader           = $reader;
         $this->commentExtractor = $commentExtractor;
         $this->handlers         = $handlers;
+        $this->setIntersectKey(
+            $this->container->getParameter('nelmio_api_doc.parsers_merge_parameters_intersect_key')
+        );
+    }
+
+    /**
+     * @param boolean $intersectKey
+     */
+    public function setIntersectKey($intersectKey)
+    {
+        $this->intersectKey = $intersectKey;
     }
 
     /**
@@ -278,7 +294,10 @@ class ApiDocExtractor
                 }
             }
 
-            $parameters = $this->clearClasses($parameters);
+            $discriminatorClasses = $this->getDiscriminatorClasses($parameters);
+            $annotation->setRequestDiscriminatorClasses($discriminatorClasses);
+
+            $parameters = $this->clearClassesAndDiscriminatorClasses($parameters);
 
             if ('PUT' === $method) {
                 // All parameters are optional with PUT (update)
@@ -301,12 +320,47 @@ class ApiDocExtractor
                 }
             }
 
-            $response = $this->clearClasses($response);
+            $discriminatorClasses = $this->getDiscriminatorClasses($response);
+            $annotation->setResponseDiscriminatorClasses($discriminatorClasses);
+
+            $response = $this->clearClassesAndDiscriminatorClasses($response);
 
             $annotation->setResponse($response);
         }
 
         return $annotation;
+    }
+
+    /**
+     * @param array $parameters
+     * @return array
+     */
+    private function getDiscriminatorClasses($parameters)
+    {
+        $discriminatorClasses = array();
+
+        foreach ($parameters as $name => $parameter) {
+            if ($this->isDiscriminatorClass($name, $parameter)) {
+                $reflection = new \ReflectionClass($name);
+                $discriminatorClasses[$reflection->getShortName()] = $parameter['discriminatorClass'];
+            }
+        }
+
+        return $discriminatorClasses;
+    }
+
+    /**
+     * @param string $name
+     * @param array $params
+     * @return bool
+     */
+    private function isDiscriminatorClass($name, $params)
+    {
+        if (class_exists($name) && !empty($params['discriminatorClass']) && $params['dataType'] == 'discriminatorClass') {
+            return true;
+        }
+
+        return false;
     }
 
     protected function normalizeClassParameter($input)
@@ -343,6 +397,8 @@ class ApiDocExtractor
      */
     protected function mergeParameters($p1, $p2)
     {
+        $p1 = $this->parersMergeParametersIntersectKey($p1, $p2);
+
         $params = $p1;
 
         foreach ($p2 as $propname => $propvalue) {
@@ -402,12 +458,16 @@ class ApiDocExtractor
      * @param  array $array The source array.
      * @return array The cleared array.
      */
-    protected function clearClasses($array)
+    protected function clearClassesAndDiscriminatorClasses($array)
     {
         if (is_array($array)) {
             unset($array['class']);
             foreach ($array as $name => $item) {
-                $array[$name] = $this->clearClasses($item);
+                $array[$name] = $this->clearClassesAndDiscriminatorClasses($item);
+
+                if ($this->isDiscriminatorClass($name, $item)) {
+                    unset($array[$name]);
+                }
             }
         }
 
@@ -428,5 +488,24 @@ class ApiDocExtractor
         }
 
         return $parsers;
+    }
+
+    /**
+     * @param array $p1
+     * @param array $p2
+     *
+     * @return array
+     */
+    protected function parersMergeParametersIntersectKey($p1, $p2)
+    {
+        if (!$this->intersectKey) {
+            return $p1;
+        }
+
+        if (!empty($p1) && !empty($p2)) {
+            return array_intersect_key($p1, $p2);
+        }
+
+        return $p1;
     }
 }

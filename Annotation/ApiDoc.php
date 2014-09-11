@@ -144,6 +144,21 @@ class ApiDoc
      * @var string
      */
     private $responseBodyExample;
+    
+    /**
+     * @var array
+     */
+    private $requestDiscriminatorClasses;
+
+    /**
+     * @var array
+     */
+    private $responseDiscriminatorClasses;
+
+    /**
+     * @var array
+     */
+    private $headers;
 
     public function __construct(array $data)
     {
@@ -165,6 +180,19 @@ class ApiDoc
                 unset($filter['name']);
 
                 $this->addFilter($name, $filter);
+            }
+        }
+
+        if (isset($data['headers'])) {
+            foreach ($data['headers'] as $header) {
+                if (!isset($header['name'])) {
+                    throw new \InvalidArgumentException('A "headers" element has to contain a "name" attribute');
+                }
+
+                $name = $header['name'];
+                unset($header['name']);
+
+                $this->addHeader($name, $header);
             }
         }
 
@@ -320,11 +348,27 @@ class ApiDoc
     }
 
     /**
+     * @param array $groups
+     */
+    public function setInputGroups(array $groups)
+    {
+        $this->input['groups'] = $groups;
+    }
+
+    /**
      * @return string|null
      */
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * @param array $groups
+     */
+    public function setOutputGroups(array $groups)
+    {
+        $this->output['groups'] = $groups;
     }
 
     /**
@@ -598,6 +642,38 @@ class ApiDoc
     }
 
     /**
+     * @param array $responseDiscriminatorClasses
+     */
+    public function setResponseDiscriminatorClasses($responseDiscriminatorClasses)
+    {
+        $this->responseDiscriminatorClasses = $responseDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponseDiscriminatorClasses()
+    {
+        return $this->responseDiscriminatorClasses;
+    }
+
+    /**
+     * @param array $requestDiscriminatorClasses
+     */
+    public function setRequestDiscriminatorClasses($requestDiscriminatorClasses)
+    {
+        $this->requestDiscriminatorClasses = $requestDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestDiscriminatorClasses()
+    {
+        return $this->requestDiscriminatorClasses;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
@@ -627,6 +703,10 @@ class ApiDoc
             $data['filters'] = $filters;
         }
 
+        if ($headers = $this->headers) {
+            $data['headers'] = $headers;
+        }
+
         if ($parameters = $this->parameters) {
             $data['parameters'] = $parameters;
         }
@@ -649,6 +729,14 @@ class ApiDoc
 
         if ($cache = $this->cache) {
             $data['cache'] = $cache;
+        }
+
+        if ($requestDiscriminatorClasses = $this->requestDiscriminatorClasses) {
+            $data['requestDiscriminatorClasses'] = $requestDiscriminatorClasses;
+        }
+
+        if ($responseDiscriminatorClasses = $this->responseDiscriminatorClasses) {
+            $data['responseDiscriminatorClasses'] = $responseDiscriminatorClasses;
         }
 
         if ($requestBodyExample = $this->requestBodyExample) {
@@ -691,5 +779,22 @@ class ApiDoc
     private function markdownBlockCodeFormater($code)
     {
         return !empty($code) ? "```\n" . $code . "\n```" : "";
+    }
+
+    /**
+     * @param string $name
+     * @param array  $header
+     */
+    public function addHeader($name, array $header)
+    {
+        $this->headers[$name] = $header;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
     }
 }

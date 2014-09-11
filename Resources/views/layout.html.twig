@@ -16,16 +16,6 @@
         <div id="header">
             <a href="{{ path('nelmio_api_doc_index') }}"><h1>{{ apiName }}</h1></a>
             <div id="sandbox_configuration">
-                body format:
-                <select id="body_format">
-                    <option value="x-www-form-urlencoded"{{ bodyFormat == 'form' ? ' selected' : '' }}>Form Data</option>
-                    <option value="json"{{ bodyFormat == 'json' ? ' selected' : '' }}>JSON</option>
-                </select>
-                request format:
-                <select id="request_format">
-                    <option value="json"{{ defaultRequestFormat == 'json' ? ' selected' : '' }}>JSON</option>
-                    <option value="xml"{{ defaultRequestFormat == 'xml' ? ' selected' : '' }}>XML</option>
-                </select>
                 {% if authentication and authentication.delivery in ['query', 'http_basic', 'header'] %}
                     api key: <input type="text" id="api_key" value=""/>
                 {% endif %}
@@ -40,7 +30,8 @@
         </div>
         {% include motdTemplate %}
         <div class="container" id="resources_container">
-            <ul id="resources">
+            <input type="text" class="search" placeholder="Search" />
+            <ul id="resources" class="list">
                 {% block content %}{% endblock %}
             </ul>
         </div>
@@ -48,6 +39,11 @@
             Documentation auto-generated on {{ date }}
         </p>
         <script type="text/javascript">
+
+            var options = {
+                valueNames : [ "heading", "options" ]
+            };
+            var userList = new List("resources_container", options);
 
             $(window).load(function() {
                 var id = (window.location.hash || '').substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
@@ -65,7 +61,7 @@
             });
 
             $('.tabs li').click(function() {
-                var contentGroup = $(this).parents('.content');
+                var contentGroup = $(this).closest('.tabs-wrapper');
 
                 $('.pane.selected', contentGroup).removeClass('selected');
                 $('.pane.' + $(this).data('pane'), contentGroup).addClass('selected');

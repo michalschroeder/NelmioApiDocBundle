@@ -65,7 +65,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class YourController extends Controller
 {
     /**
-     * This the documentation description of your method, it will appear
+     * This is the documentation description of your method, it will appear
      * on a specific pane. It will read all the text until the first
      * annotation.
      *
@@ -96,6 +96,7 @@ class YourController extends Controller
     /**
      * @ApiDoc(
      *  description="Returns a collection of Object",
+     *  output="array<Your\Namespace\Class>"
      *  requirements={
      *      {
      *          "name"="limit",
@@ -128,6 +129,8 @@ The following properties are available:
 * `deprecated`: allow to set method as deprecated (default: `false`);
 
 * `filters`: an array of filters;
+
+* `headers`: an array of headers;
 
 * `requirements`: an array of requirements;
 
@@ -215,6 +218,9 @@ class YourController
  string value or array with `file` key and path value to example with the response. See examples above.
 
 Each _filter_ has to define a `name` parameter, but other parameters are free. Filters are often optional
+parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
+
+Each _header_ has to define a `name` parameter, but other parameters are free. Headers are often optional
 parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
 
 If you set `input`, then the bundle automatically extracts parameters based on the given type,
@@ -329,6 +335,72 @@ generate returned data.
 
 This feature also works for both the `input` and `output` properties.
 
+#### Discriminators
+
+You can use a JMS\Discriminator to define multiple input/output types. All available types will be displayed in
+documentation.
+
+The following example code will display two diffrent data types (User and Admin) for the GET /user action.
+
+```
+/**
+ * @ApiDoc(
+ *  output="Acme\Bundle\Entity\AbstractUser"
+ * )
+ */
+public function getUsersAction()
+{
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+use JMS\Serializer\Annotation as JMS;
+use JMS\Serializer\Annotation\Discriminator;
+
+/**
+ * @Discriminator(field = "type", map = {
+ *      "user": "Acme\Bundle\Entity\User",
+ *      "admin": "Acme\Bundle\Entity\Admin",
+ *  }
+ * })
+ */
+abstract class AbstractUser
+{
+    /**
+     * @JMS\Type("string");
+     */
+    public $userName;
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+class User extends AbstractUser
+{
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+class Admin extends AbstractUser
+{
+    /**
+     * @JMS\Type("string");
+     */
+    public $extraField;
+}
+```
+
 ### Web Interface
 
 You can browse the whole documentation at: `http://example.org/api/doc`.
@@ -406,6 +478,15 @@ You can specify your own API name:
     nelmio_api_doc:
         name: My API
 
+You can specify if using parsers compute the intersection of arrays using keys for comparison.
+
+If you setup to `true` then if one of the parsers exclude property of an object, it will be excluded even if next parser doesn't exclude.
+If you setup to `false` then if one of the parsers exclude property of an object, it will not be excluded even if next parser doesn't exclude.
+
+    # app/config/config.yml
+    nelmio_api_doc:
+        parsers_merge_parameters_intersect_key: true
+
 You can specify which sections to exclude from the documentation generation:
 
     # app/config/config.yml
@@ -453,6 +534,7 @@ Look at the built-in [Handlers](https://github.com/nelmio/NelmioApiDocBundle/tre
 ``` yaml
 nelmio_api_doc:
     name:                     API documentation
+    parsers_merge_parameters_intersect_key: false
     exclude_sections:         []
     motd:
         template:             NelmioApiDocBundle::Components/motd.html.twig
