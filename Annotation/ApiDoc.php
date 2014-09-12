@@ -168,6 +168,10 @@ class ApiDoc
             $this->description = $data['description'];
         }
 
+        if (isset($data['documentation'])) {
+            $this->documentation = $data['documentation'];
+        }
+
         if (isset($data['input'])) {
             $this->input = $data['input'];
         } elseif (isset($data['filters'])) {
