@@ -390,4 +390,17 @@ class ApiDocTest extends TestCase
         $this->assertTrue(!empty($array['requestBodyExample']));
         $this->assertTrue(!empty($array['responseBodyExample']));
     }
+
+    public function testConstructWithDocument()
+    {
+        $data = array(
+            'documentation' => 'Simple documentation'
+        );
+
+        $annot = new ApiDoc($data);
+        $array = $annot->toArray();
+
+        $this->assertTrue(is_array($array));
+        $this->assertTrue(isset($array['documentation']));
+    }
 }

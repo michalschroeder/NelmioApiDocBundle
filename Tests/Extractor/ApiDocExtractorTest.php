@@ -12,6 +12,7 @@
 namespace Nelmio\ApiDocBundle\Tests\Extractor;
 
 use Nelmio\ApiDocBundle\Tests\WebTestCase;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class ApiDocExtractorTest extends WebTestCase
 {
@@ -170,12 +171,19 @@ class ApiDocExtractorTest extends WebTestCase
     {
         $container  = $this->getContainer();
         $extractor  = $container->get('nelmio_api_doc.extractor.api_doc_extractor');
+        /** @var ApiDoc $annotation */
         $annotation = $extractor->get('Nelmio\ApiDocBundle\Tests\Fixtures\Controller\TestController::myCommentedAction', 'test_route_5');
 
         $this->assertNotNull($annotation);
         $this->assertEquals(
             "This method is useful to test if the getDocComment works.",
             $annotation->getDescription()
+        );
+
+        $this->assertEquals(
+            "This method is useful to test if the getDocComment works." . PHP_EOL .
+            "And, it supports multilines until the first '@' char.",
+            $annotation->getDocumentation()
         );
 
         $data = $annotation->toArray();

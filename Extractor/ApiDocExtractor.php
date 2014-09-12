@@ -264,7 +264,11 @@ class ApiDocExtractor
         $annotation = clone $annotation;
 
         // doc
-        $annotation->setDocumentation($this->commentExtractor->getDocCommentText($method));
+        $documentation = $annotation->getDocumentation();
+        if (!empty($documentation)) {
+            $documentation = PHP_EOL . PHP_EOL . $documentation;
+        }
+        $annotation->setDocumentation($this->commentExtractor->getDocCommentText($method) . $documentation);
 
         // parse annotations
         $this->parseAnnotations($annotation, $route, $method);
@@ -449,7 +453,7 @@ class ApiDocExtractor
         $annots = $this->reader->getMethodAnnotations($method);
         foreach ($this->handlers as $handler) {
             $handler->handle($annotation, $annots, $route, $method);
-        }
+       }
     }
 
     /**
