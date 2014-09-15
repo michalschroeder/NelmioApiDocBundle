@@ -127,9 +127,6 @@ class JmsMetadataParser implements ParserInterface, PostParserInterface
                 // apply exclusion strategies
                 foreach ($exclusionStrategies as $strategy) {
                     if (true === $strategy->shouldSkipProperty($item, SerializationContext::create())) {
-
-                        var_dump(SerializationContext::create());
-
                         continue 2;
                     }
                 }
@@ -177,7 +174,7 @@ class JmsMetadataParser implements ParserInterface, PostParserInterface
             }
         }
 
-        /*if ($this->shouldReadDiscriminatorClasses($meta)) {
+        if ($this->shouldReadDiscriminatorClasses($meta)) {
             $discriminatorFieldName = $meta->discriminatorFieldName;
 
             foreach ($meta->discriminatorMap as $discriminatorFieldValue => $discriminatorClass) {
@@ -196,12 +193,6 @@ class JmsMetadataParser implements ParserInterface, PostParserInterface
                     'discriminatorClass' => $discriminatorClassProperties,
                 );
             }
-        }*/
-
-        if($className == 'Ydp\ContentApiBundle\Entity\Content'){
-            var_dump($groups);
-            var_dump($className, $params);
-            //die;
         }
 
         return $params;
@@ -319,32 +310,6 @@ class JmsMetadataParser implements ParserInterface, PostParserInterface
      */
     public function postParse(array $input, array $parameters)
     {
-        return $this->doPostParse($parameters);
-    }
-
-    /**
-     * Recursive `doPostParse` to avoid circular post parsing.
-     *
-     * @param  array $parameters
-     * @param  array $visited
-     * @return array
-     */
-    protected function doPostParse (array $parameters, array $visited = array())
-    {
-        foreach ($parameters as $param => $data) {
-            if (isset($data['class']) && isset($data['children']) && !in_array($data['class'], $visited)) {
-                $visited[] = $data['class'];
-
-                $input = array('class' => $data['class'], 'groups' => isset($data['groups']) ? $data['groups'] : array());
-                $parameters[$param]['children'] = array_merge(
-                    $parameters[$param]['children'], $this->doPostParse($parameters[$param]['children'], $visited)
-                );
-                $parameters[$param]['children'] = array_merge(
-                    $parameters[$param]['children'], $this->doParse($input['class'], $visited, $input['groups'])
-                );
-            }
-        }
-
         return $parameters;
     }
 
