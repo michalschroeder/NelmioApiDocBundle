@@ -58,6 +58,11 @@
         </p>
         <script type="text/javascript">
 
+            var options = {
+                valueNames : [ "heading", "options" ]
+            };
+            var userList = new List("resources_container", options);
+
             var getHash = function() {
               return window.location.hash || '';
             };
@@ -362,10 +367,6 @@
                         }
                     });
 
-
-
-
-
                     // retrieve the additional headers to send
                     $('.headers .tuple', $(this)).each(function() {
                         var key, value;
@@ -506,7 +507,6 @@
 
                     e.preventDefault();
                 });
-
 
                 // sets the correct parameter type on load
                 $('.pane.sandbox .tuple_type').each(function() {
