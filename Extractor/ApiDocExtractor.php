@@ -14,6 +14,7 @@ namespace Nelmio\ApiDocBundle\Extractor;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Util\ClassUtils;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Nelmio\ApiDocBundle\Parser\PostParserInterface;
 use Symfony\Component\Routing\Route;
@@ -161,29 +162,29 @@ class ApiDocExtractor
 
         $methodOrder = array('GET', 'POST', 'PUT', 'DELETE');
         usort($array, function ($a, $b) use ($methodOrder) {
-            if ($a['resource'] === $b['resource']) {
-                if ($a['annotation']->getRoute()->getPattern() === $b['annotation']->getRoute()->getPattern()) {
-                    $methodA = array_search($a['annotation']->getRoute()->getRequirement('_method'), $methodOrder);
-                    $methodB = array_search($b['annotation']->getRoute()->getRequirement('_method'), $methodOrder);
+                if ($a['resource'] === $b['resource']) {
+                    if ($a['annotation']->getRoute()->getPattern() === $b['annotation']->getRoute()->getPattern()) {
+                        $methodA = array_search($a['annotation']->getRoute()->getRequirement('_method'), $methodOrder);
+                        $methodB = array_search($b['annotation']->getRoute()->getRequirement('_method'), $methodOrder);
 
-                    if ($methodA === $methodB) {
-                        return strcmp(
-                            $a['annotation']->getRoute()->getRequirement('_method'),
-                            $b['annotation']->getRoute()->getRequirement('_method')
-                        );
+                        if ($methodA === $methodB) {
+                            return strcmp(
+                                $a['annotation']->getRoute()->getRequirement('_method'),
+                                $b['annotation']->getRoute()->getRequirement('_method')
+                            );
+                        }
+
+                        return $methodA > $methodB ? 1 : -1;
                     }
 
-                    return $methodA > $methodB ? 1 : -1;
+                    return strcmp(
+                        $a['annotation']->getRoute()->getPattern(),
+                        $b['annotation']->getRoute()->getPattern()
+                    );
                 }
 
-                return strcmp(
-                    $a['annotation']->getRoute()->getPattern(),
-                    $b['annotation']->getRoute()->getPattern()
-                );
-            }
-
-            return strcmp($a['resource'], $b['resource']);
-        });
+                return strcmp($a['resource'], $b['resource']);
+            });
 
         return $array;
     }
@@ -298,6 +299,8 @@ class ApiDocExtractor
                 }
             }
 
+            $parameters = $this->clearClasses($parameters);
+            $parameters = $this->generateHumanReadableTypes($parameters);
             $discriminatorClasses = $this->getDiscriminatorClasses($parameters);
             $annotation->setRequestDiscriminatorClasses($discriminatorClasses);
 
@@ -306,8 +309,8 @@ class ApiDocExtractor
             if ('PUT' === $method) {
                 // All parameters are optional with PUT (update)
                 array_walk($parameters, function ($val, $key) use (&$data) {
-                    $parameters[$key]['required'] = false;
-                });
+                        $parameters[$key]['required'] = false;
+                    });
             }
 
             $annotation->setParameters($parameters);
@@ -316,14 +319,26 @@ class ApiDocExtractor
         // output (populates 'response' for the formatters)
         if (null !== $output = $annotation->getOutput()) {
             $response         = array();
+            $supportedParsers = array();
+
             $normalizedOutput = $this->normalizeClassParameter($output);
 
             foreach ($this->getParsers($normalizedOutput) as $parser) {
                 if ($parser->supports($normalizedOutput)) {
+                    $supportedParsers[] = $parser;
                     $response = $this->mergeParameters($response, $parser->parse($normalizedOutput));
                 }
             }
 
+            foreach ($supportedParsers as $parser) {
+                if ($parser instanceof PostParserInterface) {
+                    $mp = $parser->postParse($normalizedOutput, $response);
+                    $response = $this->mergeParameters($response, $mp);
+                }
+            }
+
+            $response = $this->clearClasses($response);
+            $response = $this->generateHumanReadableTypes($response);
             $discriminatorClasses = $this->getDiscriminatorClasses($response);
             $annotation->setResponseDiscriminatorClasses($discriminatorClasses);
 
@@ -394,6 +409,7 @@ class ApiDocExtractor
      *  - Requirement parameters are concatenated.
      *  - Other string values are overridden by later parsers when present.
      *  - Array parameters are recursively merged.
+     *  - Non-null default values prevail over null default values. Later values overrides previous defaults.
      *
      * @param  array $p1 The pre-existing parameters array.
      * @param  array $p2 The newly-returned parameters array.
@@ -427,6 +443,8 @@ class ApiDocExtractor
                             } else {
                                 $v1[$name] = $value;
                             }
+                        } elseif ($name == 'default') {
+                            $v1[$name] = $value ?: $v1[$name];
                         } else {
                             $v1[$name] = $value;
                         }
@@ -453,7 +471,7 @@ class ApiDocExtractor
         $annots = $this->reader->getMethodAnnotations($method);
         foreach ($this->handlers as $handler) {
             $handler->handle($annotation, $annots, $route, $method);
-       }
+        }
     }
 
     /**
@@ -476,6 +494,79 @@ class ApiDocExtractor
         }
 
         return $array;
+    }
+
+    /**
+     * Clears the temporary 'class' parameter from the parameters array before it is returned.
+     *
+     * @param  array $array The source array.
+     * @return array The cleared array.
+     */
+    protected function clearClasses($array)
+    {
+        if (is_array($array)) {
+            unset($array['class']);
+            foreach ($array as $name => $item) {
+                $array[$name] = $this->clearClasses($item);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Populates the `dataType` properties in the parameter array if empty. Recurses through children when necessary.
+     *
+     * @param  array $array
+     * @return array
+     */
+    protected function generateHumanReadableTypes(array $array)
+    {
+        foreach ($array as $name => $info) {
+
+            if (empty($info['dataType'])) {
+                $array[$name]['dataType'] = $this->generateHumanReadableType($info['actualType'], $info['subType']);
+            }
+
+            if (isset($info['children'])) {
+                $array[$name]['children'] = $this->generateHumanReadableTypes($info['children']);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Creates a human-readable version of the `actualType`. `subType` is taken into account.
+     *
+     * @param  string $actualType
+     * @param  string $subType
+     * @return string
+     */
+    protected function generateHumanReadableType($actualType, $subType)
+    {
+        if ($actualType == DataTypes::MODEL) {
+            $parts = explode('\\', $subType);
+
+            return sprintf('object (%s)', end($parts));
+        }
+
+        if ($actualType == DataTypes::COLLECTION) {
+
+            if (DataTypes::isPrimitive($subType)) {
+                return sprintf('array of %ss', $subType);
+            }
+
+            if (class_exists($subType)) {
+                $parts = explode('\\', $subType);
+
+                return sprintf('array of objects (%s)', end($parts));
+            }
+
+            return sprintf('array of objects (%s)', $subType);
+        }
+
+        return $actualType;
     }
 
     private function getParsers(array $parameters)

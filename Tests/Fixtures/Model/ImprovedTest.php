@@ -13,19 +13,17 @@ namespace Nelmio\ApiDocBundle\Tests\Fixtures\Model;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class Test
+class ImprovedTest
 {
-    /**
-     * @Assert\Length(min="foo");
-     * @Assert\NotBlank
-     * @Assert\Type("string")
-     */
-    public $a = 'nelmio';
-
-    /**
-     * @Assert\Type("DateTime");
-     */
-    public $b;
-
-    public $c;
+    public $dt1;
+    public $dt2;
+    public $dt3;
+    public $dt4;
+    public $dt5;
+    public $d1;
+    public $d2;
+    public $c1;
+    public $c2;
+    public $c3;
+    public $c4;
 }

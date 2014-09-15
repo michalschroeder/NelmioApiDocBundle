@@ -97,7 +97,23 @@ class MarkdownFormatter extends AbstractFormatter
             }
         } else if (isset($data['parameters'])) {
             $markdown .= "#### Parameters ####\n\n";
-            $markdown .= $this->renderRequestParameters($data['parameters']);
+
+            foreach ($data['parameters'] as $name => $parameter) {
+                if (!$parameter['readonly']) {
+                    $markdown .= sprintf("%s:\n\n", $name);
+                    $markdown .= sprintf("  * type: %s\n", $parameter['dataType']);
+                    $markdown .= sprintf("  * required: %s\n", $parameter['required'] ? 'true' : 'false');
+
+                    if (isset($parameter['description']) && !empty($parameter['description'])) {
+                        $markdown .= sprintf("  * description: %s\n", $parameter['description']);
+                    }
+                    if (isset($parameter['default']) && !empty($parameter['default'])) {
+                        $markdown .= sprintf("  * default value: %s\n", $parameter['default']);
+                    }
+
+                    $markdown .= "\n";
+                }
+            }
         }
 
         if (!empty($data['responseDiscriminatorClasses'])) {
@@ -109,7 +125,31 @@ class MarkdownFormatter extends AbstractFormatter
             }
         } else if (isset($data['response'])) {
             $markdown .= "#### Response ####\n\n";
-            $markdown .= $this->renderResponseParameters($data['response']);
+
+            foreach ($data['response'] as $name => $parameter) {
+                $markdown .= sprintf("%s:\n\n", $name);
+                $markdown .= sprintf("  * type: %s\n", $parameter['dataType']);
+
+                if (isset($parameter['description']) && !empty($parameter['description'])) {
+                    $markdown .= sprintf("  * description: %s\n", $parameter['description']);
+                }
+
+                if (null !== $parameter['sinceVersion'] || null !== $parameter['untilVersion']) {
+                    $markdown .= "  * versions: ";
+                    if ($parameter['sinceVersion']) {
+                        $markdown .= '>='.$parameter['sinceVersion'];
+                    }
+                    if ($parameter['untilVersion']) {
+                        if ($parameter['sinceVersion']) {
+                            $markdown .= ',';
+                        }
+                        $markdown .= '<='.$parameter['untilVersion'];
+                    }
+                    $markdown .= "\n";
+                }
+
+                $markdown .= "\n";
+            }
         }
 
         return $markdown;

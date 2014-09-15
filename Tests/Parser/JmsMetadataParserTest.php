@@ -1,6 +1,7 @@
 <?php
 namespace NelmioApiDocBundle\Tests\Parser;
 
+use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested;
 use Nelmio\ApiDocBundle\Parser\JmsMetadataParser;
 use JMS\Serializer\Metadata\ClassMetadata;
@@ -82,6 +83,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => array(
                     'dataType'     => 'DateTime',
+                    'actualType' => DataTypes::DATETIME,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -90,6 +94,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bar' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -98,6 +105,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'baz' => array(
                     'dataType'     => 'array of integers',
+                    'actualType' => DataTypes::COLLECTION,
+                    'subType' => DataTypes::INTEGER,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -155,6 +165,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -163,6 +176,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bar' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -171,6 +187,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'baz' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -193,6 +212,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -201,6 +223,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bar' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -223,6 +248,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'bar' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -231,6 +259,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'baz' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -253,6 +284,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -261,6 +295,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bar' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -269,6 +306,9 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 'baz' => array(
                     'dataType'     => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
                     'required'     => false,
                     'description'  => null,
                     'readonly'     => false,
@@ -325,29 +365,121 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'foo' => array(
-                    'dataType'     => 'string',
-                    'required'     => false,
-                    'description'  => null,
-                    'readonly'     => false,
+                    'dataType' => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
+                    'required' => false,
+                    'description' => null,
+                    'readonly' => false,
                     'sinceVersion' => null,
                     'untilVersion' => null,
                 ),
                 'bar' => array(
-                    'dataType'     => 'string',
-                    'required'     => false,
-                    'description'  => null,
-                    'readonly'     => false,
+                    'dataType' => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => 'baz',
+                    'required' => false,
+                    'description' => null,
+                    'readonly' => false,
                     'sinceVersion' => '2.0',
                     'untilVersion' => null,
                 ),
                 'baz' => array(
-                    'dataType'     => 'string',
-                    'required'     => false,
-                    'description'  => null,
-                    'readonly'     => false,
+                    'dataType' => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
+                    'required' => false,
+                    'description' => null,
+                    'readonly' => false,
                     'sinceVersion' => null,
                     'untilVersion' => '3.0',
                 )
+            ),
+            $output
+        );
+    }
+
+    public function testParserWithInline()
+    {
+        $metadataFactory     = $this->getMock('Metadata\MetadataFactoryInterface');
+        $docCommentExtractor = $this->getMockBuilder('Nelmio\ApiDocBundle\Util\DocCommentExtractor')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $propertyMetadataFoo = new PropertyMetadata('Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsInline', 'foo');
+        $propertyMetadataFoo->type = array('name' => 'string');
+
+        $propertyMetadataInline = new PropertyMetadata('Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsInline', 'inline');
+        $propertyMetadataInline->type = array('name' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsTest');
+        $propertyMetadataInline->inline = true;
+
+        $input = 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsInline';
+
+        $metadata = new ClassMetadata($input);
+        $metadata->addPropertyMetadata($propertyMetadataFoo);
+        $metadata->addPropertyMetadata($propertyMetadataInline);
+
+        $propertyMetadataBar = new PropertyMetadata('Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsTest', 'bar');
+        $propertyMetadataBar->type = array('name' => 'string');
+
+        $subInput = 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsTest';
+
+        $subMetadata = new ClassMetadata($subInput);
+        $subMetadata->addPropertyMetadata($propertyMetadataBar);
+
+        $metadataFactory->expects($this->at(0))
+            ->method('getMetadataForClass')
+            ->with($input)
+            ->will($this->returnValue($metadata));
+
+        $metadataFactory->expects($this->at(1))
+            ->method('getMetadataForClass')
+            ->with($subInput)
+            ->will($this->returnValue($subMetadata));
+
+        $metadataFactory->expects($this->at(2))
+            ->method('getMetadataForClass')
+            ->with($subInput)
+            ->will($this->returnValue($subMetadata));
+
+        $propertyNamingStrategy = new CamelCaseNamingStrategy();
+
+        $jmsMetadataParser = new JmsMetadataParser($metadataFactory, $propertyNamingStrategy, $docCommentExtractor);
+
+        $output = $jmsMetadataParser->parse(
+            array(
+                'class'   => $input,
+                'groups'  => array(),
+            )
+        );
+
+        $this->assertEquals(
+            array(
+                'foo' => array(
+                    'dataType' => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
+                    'required' => false,
+                    'description' => null,
+                    'readonly' => false,
+                    'sinceVersion' => null,
+                    'untilVersion' => null,
+                ),
+                'bar' => array(
+                    'dataType' => 'string',
+                    'actualType' => DataTypes::STRING,
+                    'subType' => null,
+                    'default' => null,
+                    'required' => false,
+                    'description' => null,
+                    'readonly' => false,
+                    'sinceVersion' => null,
+                    'untilVersion' => null,
+                ),
             ),
             $output
         );
@@ -389,11 +521,11 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
         $metadataFactory->expects($this->any())
             ->method('getMetadataForClass')
             ->will($this->returnValueMap(
-                array(
-                    array($inputMainClass, $metadataMainClass),
-                    array($inputDiscriminatorClass, $metadataDiscriminatorClass)
-                )
-            ));
+                    array(
+                        array($inputMainClass, $metadataMainClass),
+                        array($inputDiscriminatorClass, $metadataDiscriminatorClass)
+                    )
+                ));
 
         $propertyNamingStrategy = new CamelCaseNamingStrategy();
 
@@ -411,7 +543,10 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => array(
                     'dataType'     => 'string',
+                    'actualType' => 'string',
+                    'subType' => '',
                     'required'     => false,
+                    'default' => '',
                     'description'  => null,
                     'readonly'     => false,
                     'sinceVersion' => null,
@@ -423,7 +558,10 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                     'discriminatorClass'  => array(
                         'foo' => array(
                             'dataType'     => 'string',
+                            'actualType' => 'string',
+                            'subType' => '',
                             'required'     => false,
+                            'default' => '',
                             'description'  => null,
                             'readonly'     => false,
                             'sinceVersion' => null,
@@ -431,7 +569,10 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                         ),
                         'bar' => array(
                             'dataType'     => 'string',
+                            'actualType' => 'string',
+                            'subType' => '',
                             'required'     => false,
+                            'default' => '',
                             'description'  => null,
                             'readonly'     => false,
                             'sinceVersion' => null,
@@ -440,8 +581,8 @@ class JmsMetadataParserTest extends \PHPUnit_Framework_TestCase
                         $discriminatorFieldName => array(
                             'dataType'     => 'string',
                             'required'     => true,
-                            'description'  => 'type = TYPE_1',
                             'format'       => null,
+                            'description'  => 'type = TYPE_1',
                             'readonly'     => false,
                             'sinceVersion' => null,
                             'untilVersion' => null,
