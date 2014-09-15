@@ -11,6 +11,7 @@
 
 namespace Nelmio\ApiDocBundle\Tests\Formatter;
 
+use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Tests\WebTestCase;
 
 class SimpleFormatterTest extends WebTestCase
@@ -26,6 +27,131 @@ class SimpleFormatterTest extends WebTestCase
         $result    = $container->get('nelmio_api_doc.formatter.simple_formatter')->format($data);
 
         $expected = array(
+            '/discriminators' =>
+            array(
+                0 =>
+                array(
+                    'method' => 'GET',
+                    'uri' => '/discriminators',
+                    'description' => 'Action with discriminator class in response',
+                    'response' =>
+                    array(
+                        'foo' => array(
+                            'dataType' => 'string',
+                            'actualType' => 'string',
+                            'subType' => '',
+                            'required' => false,
+                            'default' => '',
+                            'description' => null,
+                            'readonly' => false,
+                            'sinceVersion' => null,
+                            'untilVersion' => null,
+                        ),
+                    ),
+                    'responseDiscriminatorClasses' =>
+                    array(
+                        'DiscriminatorClass' =>
+                        array(
+                            'foo' => array(
+                                'dataType' => 'string',
+                                'actualType' => 'string',
+                                'subType' => '',
+                                'required' => false,
+                                'default' => '',
+                                'description' => null,
+                                'readonly' => false,
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            ),
+                            'bar' => array(
+                                'dataType' => 'string',
+                                'actualType' => 'string',
+                                'subType' => '',
+                                'required' => false,
+                                'default' => '',
+                                'description' => null,
+                                'readonly' => false,
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            ),
+                            'type' => array(
+                                'dataType' => 'string',
+                                'required' => true,
+                                'readonly' => false,
+                                'format' => null,
+                                'description' => 'type = type1',
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            )
+                        )
+                    ),
+                    'https' => false,
+                    'authentication' => false,
+                    'authenticationRoles' => array(),
+                    'deprecated' => false,
+                ),
+                1 =>
+                array(
+                    'method' => 'POST',
+                    'uri' => '/discriminators',
+                    'description' => 'Action with discriminator class in request params',
+                    'parameters' =>
+                    array(
+                        'foo' => array(
+                            'dataType' => 'string',
+                            'actualType' => 'string',
+                            'subType' => '',
+                            'required' => false,
+                            'default' => '',
+                            'description' => null,
+                            'readonly' => false,
+                            'sinceVersion' => null,
+                            'untilVersion' => null,
+                        ),
+                    ),
+                    'requestDiscriminatorClasses' =>
+                    array(
+                        'DiscriminatorClass' =>
+                        array(
+                            'foo' => array(
+                                'dataType' => 'string',
+                                'actualType' => 'string',
+                                'subType' => '',
+                                'required' => false,
+                                'default' => '',
+                                'description' => null,
+                                'readonly' => false,
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            ),
+                            'bar' => array(
+                                'dataType' => 'string',
+                                'actualType' => 'string',
+                                'subType' => '',
+                                'required' => false,
+                                'default' => '',
+                                'description' => null,
+                                'readonly' => false,
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            ),
+                            'type' => array(
+                                'dataType' => 'string',
+                                'required' => true,
+                                'readonly' => false,
+                                'format' => null,
+                                'description' => 'type = type1',
+                                'sinceVersion' => null,
+                                'untilVersion' => null,
+                            )
+                        )
+                    ),
+                    'https' => false,
+                    'authentication' => false,
+                    'authenticationRoles' => array(),
+                    'deprecated' => false,
+                )
+            ),
             '/tests' =>
             array(
                 0 =>
@@ -108,18 +234,37 @@ class SimpleFormatterTest extends WebTestCase
                     array(
                         'a' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => true,
                             'description' => 'A nice description',
                             'readonly' => false,
                         ),
                         'b' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
                         ),
                         'c' => array(
                             'dataType' => 'boolean',
+                            'actualType' => DataTypes::BOOLEAN,
+                            'subType' => null,
+                            'default' => null,
+                            'required' => true,
+                            'description' => '',
+                            'readonly' => false,
+                        ),
+                        'd' => array(
+                            'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
+                            'default' => "DefaultTest",
                             'required' => true,
                             'description' => '',
                             'readonly' => false,
@@ -149,18 +294,37 @@ class SimpleFormatterTest extends WebTestCase
                     array(
                         'a' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => true,
                             'description' => 'A nice description',
                             'readonly' => false,
                         ),
                         'b' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
                         ),
                         'c' => array(
                             'dataType' => 'boolean',
+                            'actualType' => DataTypes::BOOLEAN,
+                            'subType' => null,
+                            'default' => null,
+                            'required' => true,
+                            'description' => '',
+                            'readonly' => false,
+                        ),
+                        'd' => array(
+                            'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
+                            'default' => "DefaultTest",
                             'required' => true,
                             'description' => '',
                             'readonly' => false,
@@ -190,12 +354,25 @@ class SimpleFormatterTest extends WebTestCase
                     'description' => 'create another test',
                     'parameters' =>
                     array(
-                        'dependency_type[a]' =>
-                        array(
-                            'dataType' => 'string',
+                        'dependency_type' => array(
+                            'dataType' => 'object (dependency_type)',
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'dependency_type',
+                            'default' => null,
                             'required' => true,
-                            'description' => 'A nice description',
                             'readonly' => false,
+                            'description' => '',
+                            'children' => array(
+                                'a' => array(
+                                    'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
+                                    'required' => true,
+                                    'description' => 'A nice description',
+                                    'readonly' => false,
+                                ),
+                            ),
                         ),
                     ),
                     'https' => false,
@@ -251,6 +428,9 @@ class SimpleFormatterTest extends WebTestCase
                         'foo' =>
                         array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -260,6 +440,9 @@ class SimpleFormatterTest extends WebTestCase
                         'bar' =>
                         array(
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => true,
@@ -269,6 +452,9 @@ class SimpleFormatterTest extends WebTestCase
                         'number' =>
                         array(
                             'dataType' => 'double',
+                            'actualType' => DataTypes::FLOAT,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -278,6 +464,9 @@ class SimpleFormatterTest extends WebTestCase
                         'arr' =>
                         array(
                             'dataType' => 'array',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -287,6 +476,9 @@ class SimpleFormatterTest extends WebTestCase
                         'nested' =>
                         array(
                             'dataType' => 'object (JmsNested)',
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -297,6 +489,9 @@ class SimpleFormatterTest extends WebTestCase
                                 'foo' =>
                                 array(
                                     'dataType' => 'DateTime',
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => true,
@@ -306,6 +501,9 @@ class SimpleFormatterTest extends WebTestCase
                                 'bar' =>
                                 array(
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'baz',
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -315,6 +513,9 @@ class SimpleFormatterTest extends WebTestCase
                                 'baz' =>
                                 array(
                                     'dataType' => 'array of integers',
+                                    'actualType' => DataTypes::COLLECTION,
+                                    'subType' => DataTypes::INTEGER,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => 'Epic description.
 
@@ -326,6 +527,9 @@ With multiple lines.',
                                 'circular' =>
                                 array(
                                     'dataType' => 'object (JmsNested)',
+                                    'actualType' => DataTypes::MODEL,
+                                    'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -335,6 +539,9 @@ With multiple lines.',
                                 'parent' =>
                                 array(
                                     'dataType' => 'object (JmsTest)',
+                                    'actualType' => DataTypes::MODEL,
+                                    'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsTest',
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -345,6 +552,9 @@ With multiple lines.',
                                         'foo' =>
                                         array(
                                             'dataType' => 'string',
+                                            'actualType' => DataTypes::STRING,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -354,6 +564,9 @@ With multiple lines.',
                                         'bar' =>
                                         array(
                                             'dataType' => 'DateTime',
+                                            'actualType' => DataTypes::DATETIME,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => true,
@@ -363,6 +576,9 @@ With multiple lines.',
                                         'number' =>
                                         array(
                                             'dataType' => 'double',
+                                            'actualType' => DataTypes::FLOAT,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -372,6 +588,9 @@ With multiple lines.',
                                         'arr' =>
                                         array(
                                             'dataType' => 'array',
+                                            'actualType' => DataTypes::COLLECTION,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -381,6 +600,9 @@ With multiple lines.',
                                         'nested' =>
                                         array(
                                             'dataType' => 'object (JmsNested)',
+                                            'actualType' => DataTypes::MODEL,
+                                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -390,6 +612,9 @@ With multiple lines.',
                                         'nested_array' =>
                                         array(
                                             'dataType' => 'array of objects (JmsNested)',
+                                            'actualType' => DataTypes::COLLECTION,
+                                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -401,6 +626,9 @@ With multiple lines.',
                                 'since' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -410,6 +638,9 @@ With multiple lines.',
                                 'until' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -419,6 +650,9 @@ With multiple lines.',
                                 'since_and_until' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -430,6 +664,9 @@ With multiple lines.',
                         'nested_array' =>
                         array(
                             'dataType' => 'array of objects (JmsNested)',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -449,12 +686,25 @@ With multiple lines.',
                     'description' => 'Testing return',
                     'response' =>
                     array(
-                        'dependency_type[a]' =>
-                        array(
-                            'dataType' => 'string',
+                        'dependency_type' => array(
+                            'dataType' => 'object (dependency_type)',
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'dependency_type',
+                            'default' => null,
                             'required' => true,
-                            'description' => 'A nice description',
                             'readonly' => false,
+                            'description' => '',
+                            'children' => array(
+                                'a' => array(
+                                    'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
+                                    'required' => true,
+                                    'description' => 'A nice description',
+                                    'readonly' => false,
+                                ),
+                            ),
                         ),
                     ),
                     'https' => false,
@@ -516,6 +766,9 @@ And, it supports multilines until the first \'@\' char.',
                         'foo' =>
                         array (
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -525,6 +778,9 @@ And, it supports multilines until the first \'@\' char.',
                         'bar' =>
                         array (
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => true,
@@ -534,6 +790,9 @@ And, it supports multilines until the first \'@\' char.',
                         'number' =>
                         array (
                             'dataType' => 'double',
+                            'actualType' => DataTypes::FLOAT,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -543,6 +802,9 @@ And, it supports multilines until the first \'@\' char.',
                         'arr' =>
                         array (
                             'dataType' => 'array',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -552,6 +814,9 @@ And, it supports multilines until the first \'@\' char.',
                         'nested' =>
                         array (
                             'dataType' => 'object (JmsNested)',
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -562,6 +827,9 @@ And, it supports multilines until the first \'@\' char.',
                                 'foo' =>
                                 array (
                                     'dataType' => 'DateTime',
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => true,
@@ -571,6 +839,9 @@ And, it supports multilines until the first \'@\' char.',
                                 'bar' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'baz',
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -580,6 +851,9 @@ And, it supports multilines until the first \'@\' char.',
                                 'baz' =>
                                 array (
                                     'dataType' => 'array of integers',
+                                    'actualType' => DataTypes::COLLECTION,
+                                    'subType' => DataTypes::INTEGER,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => 'Epic description.
 
@@ -591,6 +865,9 @@ With multiple lines.',
                                 'circular' =>
                                 array (
                                     'dataType' => 'object (JmsNested)',
+                                    'actualType' => DataTypes::MODEL,
+                                    'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -600,6 +877,9 @@ With multiple lines.',
                                 'parent' =>
                                 array (
                                     'dataType' => 'object (JmsTest)',
+                                    'actualType' => DataTypes::MODEL,
+                                    'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsTest',
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -610,6 +890,9 @@ With multiple lines.',
                                         'foo' =>
                                         array (
                                             'dataType' => 'string',
+                                            'actualType' => DataTypes::STRING,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -619,6 +902,9 @@ With multiple lines.',
                                         'bar' =>
                                         array (
                                             'dataType' => 'DateTime',
+                                            'actualType' => DataTypes::DATETIME,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => true,
@@ -628,6 +914,9 @@ With multiple lines.',
                                         'number' =>
                                         array (
                                             'dataType' => 'double',
+                                            'actualType' => DataTypes::FLOAT,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -637,6 +926,9 @@ With multiple lines.',
                                         'arr' =>
                                         array (
                                             'dataType' => 'array',
+                                            'actualType' => DataTypes::COLLECTION,
+                                            'subType' => null,
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -646,6 +938,9 @@ With multiple lines.',
                                         'nested' =>
                                         array (
                                             'dataType' => 'object (JmsNested)',
+                                            'actualType' => DataTypes::MODEL,
+                                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -655,6 +950,9 @@ With multiple lines.',
                                         'nested_array' =>
                                         array (
                                             'dataType' => 'array of objects (JmsNested)',
+                                            'actualType' => DataTypes::COLLECTION,
+                                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                                            'default' => null,
                                             'required' => false,
                                             'description' => '',
                                             'readonly' => false,
@@ -666,6 +964,9 @@ With multiple lines.',
                                 'since' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -675,6 +976,9 @@ With multiple lines.',
                                 'until' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -684,6 +988,9 @@ With multiple lines.',
                                 'since_and_until' =>
                                 array (
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => false,
                                     'description' => '',
                                     'readonly' => false,
@@ -695,6 +1002,9 @@ With multiple lines.',
                         'nested_array' =>
                         array (
                             'dataType' => 'array of objects (JmsNested)',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\JmsNested',
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -741,6 +1051,27 @@ With multiple lines.',
                 ),
                 11 =>
                 array(
+                    'method' => 'POST',
+                    'uri' => '/z-action-with-nullable-request-param',
+                    'parameters' =>
+                    array(
+                        'param1' =>
+                        array(
+                            'required' => false,
+                            'dataType' => 'string',
+                            'description' => 'Param1 description.',
+                            'readonly' => false,
+                            'actualType' => 'string',
+                            'subType' => null,
+                        ),
+                    ),
+                    'https' => false,
+                    'authentication' => false,
+                    'authenticationRoles' => array(),
+                    'deprecated' => false,
+                ),
+                12 =>
+                array(
                     'method' => 'GET',
                     'uri' => '/z-action-with-query-param',
                     'filters' =>
@@ -757,7 +1088,7 @@ With multiple lines.',
                     'authenticationRoles' => array(),
                     'deprecated' => false,
                 ),
-                12 =>
+                13 =>
                 array(
                     'method' => 'GET',
                     'uri' => '/z-action-with-query-param-no-default',
@@ -774,7 +1105,7 @@ With multiple lines.',
                     'authenticationRoles' => array(),
                     'deprecated' => false,
                 ),
-                13 =>
+                14 =>
                 array(
                     'method' => 'GET',
                     'uri' => '/z-action-with-query-param-strict',
@@ -792,7 +1123,7 @@ With multiple lines.',
                     'authenticationRoles' => array(),
                     'deprecated' => false,
                 ),
-                14 =>
+                15 =>
                 array(
                     'method' => 'POST',
                     'uri' => '/z-action-with-request-param',
@@ -802,6 +1133,8 @@ With multiple lines.',
                         array(
                             'required' => true,
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
                             'description' => 'Param1 description.',
                             'readonly' => false,
                         ),
@@ -811,7 +1144,7 @@ With multiple lines.',
                     'authenticationRoles' => array(),
                     'deprecated' => false,
                 ),
-                15 =>
+                16 =>
                 array(
                     'method' => 'ANY',
                     'uri' => '/z-return-jms-and-validator-output',
@@ -821,11 +1154,17 @@ With multiple lines.',
                     'response' => array (
                         'bar' => array(
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => null,
                             'readonly' => null
                         ),
                         'number' => array(
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -834,26 +1173,65 @@ With multiple lines.',
                         ),
                         'objects' => array(
                             'dataType' => 'array of objects (Test)',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\Test',
+                            'default' => null,
                             'readonly' => null,
                             'required' => null,
                             'children' => array(
                                 'a' => array(
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'nelmio',
                                     'format' => '{length: min: foo}, {not blank}',
                                     'required' => true,
                                     'readonly' => null
                                 ),
                                 'b' => array(
                                     'dataType' => 'DateTime',
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => null,
                                     'readonly' => null
+                                )
+                            )
+                        ),
+                        'related' => array(
+                            'dataType' => 'object (Test)',
+                            'readonly' => false,
+                            'required' => false,
+                            'description' => '',
+                            'sinceVersion' => null,
+                            'untilVersion' => null,
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\Test',
+                            'default' => null,
+                            'children' => array(
+                                'a' => array(
+                                    'dataType' => 'string',
+                                    'format' => '{length: min: foo}, {not blank}',
+                                    'required' => true,
+                                    'readonly' => null,
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'nelmio',
+                                ),
+                                'b' => array(
+                                    'dataType' => 'DateTime',
+                                    'required' => null,
+                                    'readonly' => null,
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                 )
                             )
                         )
                     ),
                     'authenticationRoles' => array(),
                 ),
-                16 =>
+                17 =>
                 array(
                     'method' => "ANY",
                     'uri' => "/z-return-selected-parsers-input",
@@ -865,25 +1243,44 @@ With multiple lines.',
                     array(
                         'a' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => true,
                             'description' => 'A nice description',
                             'readonly' => false,
                         ),
                         'b' => array(
                             'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
                         ),
                         'c' => array(
                             'dataType' => 'boolean',
+                            'actualType' => DataTypes::BOOLEAN,
+                            'subType' => null,
+                            'default' => null,
+                            'required' => true,
+                            'description' => '',
+                            'readonly' => false,
+                        ),
+                        'd' => array(
+                            'dataType' => 'string',
+                            'actualType' => DataTypes::STRING,
+                            'subType' => null,
+                            'default' => null,
+                            'default' => "DefaultTest",
                             'required' => true,
                             'description' => '',
                             'readonly' => false,
                         ),
                     )
                 ),
-                17 =>
+                18 =>
                 array(
                     'method' => "ANY",
                     'uri' => "/z-return-selected-parsers-output",
@@ -893,11 +1290,17 @@ With multiple lines.',
                     'response' => array (
                         'bar' => array(
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => null,
                             'readonly' => null
                         ),
                         'number' => array(
                             'dataType' => 'DateTime',
+                            'actualType' => DataTypes::DATETIME,
+                            'subType' => null,
+                            'default' => null,
                             'required' => false,
                             'description' => '',
                             'readonly' => false,
@@ -906,19 +1309,58 @@ With multiple lines.',
                         ),
                         'objects' => array(
                             'dataType' => 'array of objects (Test)',
+                            'actualType' => DataTypes::COLLECTION,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\Test',
+                            'default' => null,
                             'readonly' => null,
                             'required' => null,
                             'children' => array(
                                 'a' => array(
                                     'dataType' => 'string',
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'nelmio',
                                     'format' => '{length: min: foo}, {not blank}',
                                     'required' => true,
                                     'readonly' => null
                                 ),
                                 'b' => array(
                                     'dataType' => 'DateTime',
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                     'required' => null,
                                     'readonly' => null
+                                )
+                            )
+                        ),
+                        'related' => array(
+                            'dataType' => 'object (Test)',
+                            'readonly' => false,
+                            'required' => false,
+                            'description' => '',
+                            'sinceVersion' => null,
+                            'untilVersion' => null,
+                            'actualType' => DataTypes::MODEL,
+                            'subType' => 'Nelmio\ApiDocBundle\Tests\Fixtures\Model\Test',
+                            'default' => null,
+                            'children' => array(
+                                'a' => array(
+                                    'dataType' => 'string',
+                                    'format' => '{length: min: foo}, {not blank}',
+                                    'required' => true,
+                                    'readonly' => null,
+                                    'actualType' => DataTypes::STRING,
+                                    'subType' => null,
+                                    'default' => 'nelmio',
+                                ),
+                                'b' => array(
+                                    'dataType' => 'DateTime',
+                                    'required' => null,
+                                    'readonly' => null,
+                                    'actualType' => DataTypes::DATETIME,
+                                    'subType' => null,
+                                    'default' => null,
                                 )
                             )
                         )

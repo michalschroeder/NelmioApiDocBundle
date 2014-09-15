@@ -144,6 +144,26 @@ class ApiDoc
      * @var string
      */
     private $responseBodyExample;
+    
+    /**
+     * @var array
+     */
+    private $requestDiscriminatorClasses;
+
+    /**
+     * @var array
+     */
+    private $responseDiscriminatorClasses;
+
+    /**
+     * @var array
+     */
+    private $headers;
+
+    /**
+     * @var array
+     */
+    private $tags = array();
 
     public function __construct(array $data)
     {
@@ -151,6 +171,10 @@ class ApiDoc
 
         if (isset($data['description'])) {
             $this->description = $data['description'];
+        }
+
+        if (isset($data['documentation'])) {
+            $this->documentation = $data['documentation'];
         }
 
         if (isset($data['input'])) {
@@ -165,6 +189,19 @@ class ApiDoc
                 unset($filter['name']);
 
                 $this->addFilter($name, $filter);
+            }
+        }
+
+        if (isset($data['headers'])) {
+            foreach ($data['headers'] as $header) {
+                if (!isset($header['name'])) {
+                    throw new \InvalidArgumentException('A "headers" element has to contain a "name" attribute');
+                }
+
+                $name = $header['name'];
+                unset($header['name']);
+
+                $this->addHeader($name, $header);
             }
         }
 
@@ -231,6 +268,16 @@ class ApiDoc
 
         if (isset($data['deprecated'])) {
             $this->deprecated = $data['deprecated'];
+        }
+
+        if (isset($data['tags'])) {
+            $tags = $data['tags'];
+
+            if (!is_array($tags)) {
+                $tags = array($tags);
+            }
+
+            $this->tags = $tags;
         }
 
         if (isset($data['https'])) {
@@ -320,11 +367,27 @@ class ApiDoc
     }
 
     /**
+     * @param array $groups
+     */
+    public function setInputGroups(array $groups)
+    {
+        $this->input['groups'] = $groups;
+    }
+
+    /**
      * @return string|null
      */
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * @param array $groups
+     */
+    public function setOutputGroups(array $groups)
+    {
+        $this->output['groups'] = $groups;
     }
 
     /**
@@ -417,7 +480,7 @@ class ApiDoc
     }
 
     /**
-     * Sets the responsed data as processed by the parsers - same format as parameters
+     * Sets the response data as processed by the parsers - same format as parameters
      *
      * @param array $response
      */
@@ -588,6 +651,22 @@ class ApiDoc
     }
 
     /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
      * @param boolean $deprecated
      */
     public function setDeprecated($deprecated)
@@ -595,6 +674,38 @@ class ApiDoc
         $this->deprecated = (bool) $deprecated;
 
         return $this;
+    }
+
+    /**
+     * @param array $responseDiscriminatorClasses
+     */
+    public function setResponseDiscriminatorClasses($responseDiscriminatorClasses)
+    {
+        $this->responseDiscriminatorClasses = $responseDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponseDiscriminatorClasses()
+    {
+        return $this->responseDiscriminatorClasses;
+    }
+
+    /**
+     * @param array $requestDiscriminatorClasses
+     */
+    public function setRequestDiscriminatorClasses($requestDiscriminatorClasses)
+    {
+        $this->requestDiscriminatorClasses = $requestDiscriminatorClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestDiscriminatorClasses()
+    {
+        return $this->requestDiscriminatorClasses;
     }
 
     /**
@@ -627,6 +738,10 @@ class ApiDoc
             $data['filters'] = $filters;
         }
 
+        if ($headers = $this->headers) {
+            $data['headers'] = $headers;
+        }
+
         if ($parameters = $this->parameters) {
             $data['parameters'] = $parameters;
         }
@@ -649,6 +764,18 @@ class ApiDoc
 
         if ($cache = $this->cache) {
             $data['cache'] = $cache;
+        }
+
+        if ($tags = $this->tags) {
+            $data['tags'] = $tags;
+        }
+
+        if ($requestDiscriminatorClasses = $this->requestDiscriminatorClasses) {
+            $data['requestDiscriminatorClasses'] = $requestDiscriminatorClasses;
+        }
+
+        if ($responseDiscriminatorClasses = $this->responseDiscriminatorClasses) {
+            $data['responseDiscriminatorClasses'] = $responseDiscriminatorClasses;
         }
 
         if ($requestBodyExample = $this->requestBodyExample) {
@@ -691,5 +818,22 @@ class ApiDoc
     private function markdownBlockCodeFormater($code)
     {
         return !empty($code) ? "```\n" . $code . "\n```" : "";
+    }
+
+    /**
+     * @param string $name
+     * @param array  $header
+     */
+    public function addHeader($name, array $header)
+    {
+        $this->headers[$name] = $header;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
     }
 }

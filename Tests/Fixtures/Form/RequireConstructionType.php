@@ -15,18 +15,25 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class TestType extends AbstractType
+class RequireConstructionType extends AbstractType
 {
+    private $noThrow;
+
+    public function __construct($optionalArgs = null)
+    {
+        $this->noThrow = true;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if ($this->noThrow !== true)
+            throw new \RuntimeException(__CLASS__ . " require contruction");
+
         $builder
             ->add('a', null, array('description' => 'A nice description'))
-            ->add('b')
-            ->add($builder->create('c', 'checkbox'))
-            ->add('d','text',array( 'data' => 'DefaultTest'))
         ;
     }
 
@@ -44,6 +51,6 @@ class TestType extends AbstractType
 
     public function getName()
     {
-        return '';
+        return 'require_construction_type';
     }
 }
