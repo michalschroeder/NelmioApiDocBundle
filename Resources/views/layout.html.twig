@@ -15,17 +15,35 @@
     <body>
         <div id="header">
             <a href="{{ path('nelmio_api_doc_index') }}"><h1>{{ apiName }}</h1></a>
-            <div id="sandbox_configuration">
-                {% if authentication and authentication.delivery in ['query', 'http_basic', 'header'] %}
-                    api key: <input type="text" id="api_key" value=""/>
-                {% endif %}
-                {% if authentication and authentication.delivery in ['http_basic'] %}
-                    api pass: <input type="text" id="api_pass" value=""/>
-                {% endif %}
-                {% if authentication and authentication.custom_endpoint %}
-                    api endpoint: <input type="text" id="api_endpoint" value=""/>
-                {% endif %}
-            </div>
+            {% if enableSandbox %}
+                <div id="sandbox_configuration">
+                    {% if bodyFormats|length > 0 %}
+                    body format:
+                    <select id="body_format">
+                        {% if 'form' in bodyFormats %}<option value="form"{{ defaultBodyFormat == 'form' ? ' selected' : '' }}>Form Data</option>{% endif %}
+                        {% if 'json' in bodyFormats %}<option value="json"{{ defaultBodyFormat == 'json' ? ' selected' : '' }}>JSON</option>{% endif %}
+                    </select>
+                    {% endif %}
+                    request format:
+                    <select id="request_format">
+                    {% for format, header in requestFormats %}
+                        <option value="{{ header }}"{{ defaultRequestFormat == format ? ' selected' : '' }}>{{ format }}</option>
+                    {% endfor %}
+                    </select>
+                    {% if authentication %}
+                        {% if authentication.delivery == 'http' and authentication.type == 'basic' %}
+                            api login: <input type="text" id="api_login" value=""/>
+                            api password: <input type="text" id="api_pass" value=""/>
+                        {% elseif authentication.delivery in ['query', 'http', 'header'] %}
+                            api key: <input type="text" id="api_key" value=""/>
+                        {% endif %}
+
+                        {% if authentication.custom_endpoint %}
+                            api endpoint: <input type="text" id="api_endpoint" value=""/>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
             <br style="clear: both;" />
         </div>
         {% include motdTemplate %}
@@ -45,19 +63,52 @@
             };
             var userList = new List("resources_container", options);
 
+            var getHash = function() {
+              return window.location.hash || '';
+            };
+
+            var setHash = function(hash) {
+                window.location.hash = hash;
+            };
+
+            var clearHash = function() {
+                var scrollTop, scrollLeft;
+
+                if(typeof history === 'object' && typeof history.pushState === 'function') {
+                    history.replaceState('', document.title, window.location.pathname + window.location.search);
+                } else {
+                    scrollTop = document.body.scrollTop;
+                    scrollLeft = document.body.scrollLeft;
+
+                    setHash('');
+
+                    document.body.scrollTop = scrollTop;
+                    document.body.scrollLeft = scrollLeft;
+                }
+            };
+
             $(window).load(function() {
-                var id = (window.location.hash || '').substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
+                var id = getHash().substr(1).replace( /([:\.\[\]\{\}])/g, "\\$1");
                 var elem = $('#' + id);
                 if (elem.length) {
                     setTimeout(function() {
                         $('body,html').scrollTop(elem.position().top);
                     });
-                    elem.find('a.toggler').click();
+                    elem.find('.toggler').click();
                 }
             });
 
-            $('.toggler').click(function() {
-                $(this).next().slideToggle('fast');
+            $('.toggler').click(function(event) {
+                var contentContainer = $(this).next();
+
+                if(contentContainer.is(':visible')) {
+                    clearHash();
+                } else {
+                    setHash($(this).data('href'));
+                }
+
+                contentContainer.slideToggle('fast');
+                return false;
             });
 
             $('.tabs li').click(function() {
@@ -71,6 +122,39 @@
             });
 
             {% if enableSandbox %}
+            var setParameterType = function ($context,setType) {
+                // no 2nd argument, use default from parameters
+                if (typeof setType == "undefined") {
+                    setType = $context.parent().attr("data-dataType");
+                    $context.val(setType);
+                }
+
+                $context.parent().find('.value').remove();
+                var placeholder = "";
+                if ($context.parent().attr("data-dataType") != "" && typeof $context.parent().attr("data-dataType") != "undefined") {
+                    placeholder += "[" + $context.parent().attr("data-dataType") + "] ";
+                }
+                if ($context.parent().attr("data-format") != "" && typeof $context.parent().attr("data-format") != "undefined") {
+                    placeholder += $context.parent().attr("data-dataType");
+                }
+                if ($context.parent().attr("data-description") != "" && typeof $context.parent().attr("data-description") != "undefined") {
+                    placeholder += $context.parent().attr("data-description");
+                } else {
+                    placeholder += "Value";
+                }
+
+                switch(setType) {
+                    case "boolean":
+                        $('<select class="value"><option value=""></option><option value="1">True</option><option value="0">False</option></select>').insertAfter($context);
+                        break;
+                    case "file":
+                        $('<input type="file" class="value" placeholder="'+ placeholder +'">').insertAfter($context);
+                        break;
+                    default:
+                        $('<input type="text" class="value" placeholder="'+ placeholder +'">').insertAfter($context);
+                }
+            };
+
                 var toggleButtonText = function ($btn) {
                     if ($btn.text() === 'Default') {
                         $btn.text('Raw');
@@ -135,6 +219,16 @@
                     return body;
                 }
 
+                $('.tabs li').click(function() {
+                    var contentGroup = $(this).parents('.content');
+
+                    $('.pane.selected', contentGroup).removeClass('selected');
+                    $('.pane.' + $(this).data('pane'), contentGroup).addClass('selected');
+
+                    $('li', $(this).parent()).removeClass('selected');
+                    $(this).addClass('selected');
+                });
+
                 var prettifyResponse = function(text) {
                     try {
                         var data = typeof text === 'string' ? JSON.parse(text) : text;
@@ -149,6 +243,17 @@
                 var displayFinalUrl = function(xhr, method, url, container) {
                     container.text(method + ' ' + url);
                 };
+
+                var displayProfilerUrl = function(xhr, link, container) {
+                    var profilerUrl = xhr.getResponseHeader('X-Debug-Token-Link');
+                    if (profilerUrl) {
+                        link.attr('href', profilerUrl);
+                        container.show();
+                    } else {
+                        link.attr('href', '');
+                        container.hide();
+                    }
+                }
 
                 var displayResponseData = function(xhr, container) {
                     var data = xhr.responseText;
@@ -170,6 +275,7 @@
 
                 var displayResponse = function(xhr, method, url, result_container) {
                     displayFinalUrl(xhr, method, url, $('.url', result_container));
+                    displayProfilerUrl(xhr, $('.profiler-link', result_container), $('.profiler', result_container));
                     displayResponseData(xhr, $('.response', result_container));
                     displayResponseHeaders(xhr, $('.headers', result_container));
 
@@ -181,6 +287,8 @@
                         method = $(this).attr('method'),
                         self = this,
                         params = {},
+                        formData = new FormData(),
+                        doubledParams = {},
                         headers = {},
                         content = $(this).find('textarea.content').val(),
                         result_container = $('.result', $(this).parent());
@@ -191,21 +299,56 @@
                         method = method.split('|').sort().pop();
                     }
 
-                    // set default requestFormat
-                    var requestFormat = $('#request_format').val();
+                    // set requestFormat
                     var requestFormatMethod = '{{ requestFormatMethod }}';
                     if (requestFormatMethod == 'format_param') {
-                        params['_format'] = requestFormat;
+                        params['_format'] = $('#request_format option:selected').text();
+                        formData.append('_format',$('#request_format option:selected').text());
                     } else if (requestFormatMethod == 'accept_header') {
-                        headers['Accept'] = 'application/' + requestFormat;
+                        headers['Accept'] = $('#request_format').val();
                     }
 
                     // set default bodyFormat
-                    var bodyFormat = $('#body_format').val();
+                    var bodyFormat = $('#body_format').val() || '{{ defaultBodyFormat }}';
 
                     if(!('Content-type' in headers)) {
-                        headers['Content-type'] = 'application/'+bodyFormat;
+                        if (bodyFormat == 'form') {
+                            headers['Content-type'] = 'application/x-www-form-urlencoded';
+                        } else {
+                            headers['Content-type'] = 'application/json';
+                        }
                     }
+
+                    var hasFileTypes = false;
+                    $('.parameters .tuple_type', $(this)).each(function() {
+                        if ($(this).val() == 'file') {
+                            hasFileTypes = true;
+                        }
+                    });
+
+                    if (hasFileTypes && method != 'POST') {
+                        alert("Sorry, you can only submit files via POST.");
+                        return false;
+                    }
+
+                    if (hasFileTypes) {
+                        // retrieve all the parameters to send for file upload
+                        $('.parameters .tuple', $(this)).each(function() {
+                            var key, value;
+
+                            key = $('.key', $(this)).val();
+                            if ($('.value', $(this)).attr('type') === 'file' ) {
+                                value = $('.value', $(this)).prop('files')[0];
+                            } else {
+                                value = $('.value', $(this)).val();
+                            }
+
+                            if (value) {
+                                formData.append(key,value);
+                            }
+                        });
+                    }
+
 
                     // retrieve all the parameters to send
                     $('.parameters .tuple', $(this)).each(function() {
@@ -215,7 +358,12 @@
                         value = $('.value', $(this)).val();
 
                         if (value) {
-                            params[key] = value;
+                            // temporary save all additional/doubled parameters
+                            if (key in params) {
+                                doubledParams[key] = value;
+                            } else {
+                                params[key] = value;
+                            }
                         }
                     });
 
@@ -240,6 +388,11 @@
                         }
                     };
 
+                    // merge additional params back to real params object
+                    if (!$.isEmptyObject(doubledParams)) {
+                        $.extend(params, doubledParams);
+                    }
+
                     // disable all the fiels and buttons
                     $('input, button', $(this)).attr('disabled', 'disabled');
 
@@ -259,6 +412,12 @@
                         endpoint = $('#api_endpoint').val();
                     }
 
+                    // Workaround for Firefox bug and a thereby resulting nginx incompatibility
+                    if (method == "LINK") {
+                        method = "POST";
+                        params._method = "LINK";
+                    }
+
                     // prepare final parameters
                     var body = {};
                     if(bodyFormat == 'json' && method != 'GET') {
@@ -268,19 +427,27 @@
                         body = params;
                     }
                     var data = content.length ? content : body;
-
-                    // and trigger the API call
-                    $.ajax({
+                    var ajaxOptions = {
                         url: endpoint + url,
                         type: method,
                         data: data,
                         headers: headers,
                         crossDomain: true,
                         beforeSend: function (xhr) {
-                            if (authentication_delivery == 'http_basic') {
-                                xhr.setRequestHeader('Authorization', 'Basic ' + btoa($('#api_key').val() + ':' + $('#api_pass').val()));
-                            }else if(authentication_delivery == 'header') {
-                                xhr.setRequestHeader(api_key_parameter, $('#api_key').val());
+                            if (authentication_delivery) {
+                                var value;
+
+                                if ('http' == authentication_delivery) {
+                                    if ('basic' == authentication_type) {
+                                        value = 'Basic ' + btoa($('#api_login').val() + ':' + $('#api_pass').val());
+                                    } else if ('bearer' == authentication_type) {
+                                        value = 'Bearer ' + $('#api_key').val();
+                                    }
+                                } else if ('header' == authentication_delivery) {
+                                    value = $('#api_key').val();
+                                }
+
+                                xhr.setRequestHeader(api_key_parameter, value);
                             }
                         },
                         complete: function(xhr) {
@@ -289,14 +456,25 @@
                             // and enable them back
                             $('input:not(.content-type), button', $(self)).removeAttr('disabled');
                         }
-                    });
+                    };
+
+                    // overrides body format to send data properly
+                    if (hasFileTypes) {
+                        ajaxOptions.data = formData;
+                        ajaxOptions.processData = false;
+                        ajaxOptions.contentType = false;
+                        delete(ajaxOptions.headers);
+                    }
+
+                    // and trigger the API call
+                    $.ajax(ajaxOptions);
 
                     return false;
                 });
 
-                $('.operations').on('click', '.operation > a', function(e) {
+                $('.operations').on('click', '.operation > .heading', function(e) {
                     if (history.pushState) {
-                        history.pushState(null, null, $(this).attr('href'));
+                        history.pushState(null, null, $(this).data('href'));
                         e.preventDefault();
                     }
                 });
@@ -330,8 +508,29 @@
                     e.preventDefault();
                 });
 
-                $('.pane.sandbox').on('click', '.add', function() {
-                    var html = $(this).parents('.pane').find('.tuple_template').html();
+                // sets the correct parameter type on load
+                $('.pane.sandbox .tuple_type').each(function() {
+                    setParameterType($(this));
+                });
+
+
+                // handles parameter type change
+                $('.pane.sandbox').on('change', '.tuple_type', function() {
+                    setParameterType($(this),$(this).val());
+                });
+
+
+
+                $('.pane.sandbox').on('click', '.add_parameter', function() {
+                    var html = $(this).parents('.pane').find('.parameters_tuple_template').html();
+
+                    $(this).before(html);
+
+                    return false;
+                });
+
+                $('.pane.sandbox').on('click', '.add_header', function() {
+                    var html = $(this).parents('.pane').find('.headers_tuple_template').html();
 
                     $(this).before(html);
 
@@ -372,8 +571,10 @@
 
                 });
 
-                {% if authentication and authentication.delivery == 'http_basic' %}
+                {% if authentication and authentication.delivery == 'http' %}
                 var authentication_delivery = '{{ authentication.delivery }}';
+                var api_key_parameter = '{{ authentication.name }}';
+                var authentication_type = '{{ authentication.type }}';
                 {% elseif authentication and authentication.delivery == 'query' %}
                 var authentication_delivery = '{{ authentication.delivery }}';
                 var api_key_parameter = '{{ authentication.name }}';

@@ -16,7 +16,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class ApiDocExtractorTest extends WebTestCase
 {
-    const ROUTES_QUANTITY = 26;
+    const ROUTES_QUANTITY = 27;
 
     public function testAll()
     {
@@ -108,7 +108,7 @@ class ApiDocExtractorTest extends WebTestCase
         $this->assertTrue(is_array($array['filters']));
         $this->assertNull($annotation->getInput());
 
-        $annotation2 = $extractor->get('nemlio.test.controller:indexAction', 'test_service_route_1');
+        $annotation2 = $extractor->get('nelmio.test.controller:indexAction', 'test_service_route_1');
         $annotation2->getRoute()
             ->setDefault('_controller', $annotation->getRoute()->getDefault('_controller'))
             ->compile(); // compile as we changed a default value
@@ -136,7 +136,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller:indexAction', 'invalid_route');
+        $data = $extractor->get('nelmio.test.controller:indexAction', 'invalid_route');
 
         $this->assertNull($data);
     }
@@ -149,7 +149,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller', 'test_service_route_1');
+        $data = $extractor->get('nelmio.test.controller', 'test_service_route_1');
 
         $this->assertNull($data);
     }
@@ -162,7 +162,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller:anotherAction', 'test_service_route_1');
+        $data = $extractor->get('nelmio.test.controller:anotherAction', 'test_service_route_1');
 
         $this->assertNull($data);
     }

@@ -160,6 +160,11 @@ class ApiDoc
      */
     private $headers;
 
+    /**
+     * @var array
+     */
+    private $tags = array();
+
     public function __construct(array $data)
     {
         $this->resource = !empty($data['resource']) ? $data['resource'] : false;
@@ -263,6 +268,16 @@ class ApiDoc
 
         if (isset($data['deprecated'])) {
             $this->deprecated = $data['deprecated'];
+        }
+
+        if (isset($data['tags'])) {
+            $tags = $data['tags'];
+
+            if (!is_array($tags)) {
+                $tags = array($tags);
+            }
+
+            $this->tags = $tags;
         }
 
         if (isset($data['https'])) {
@@ -465,7 +480,7 @@ class ApiDoc
     }
 
     /**
-     * Sets the responsed data as processed by the parsers - same format as parameters
+     * Sets the response data as processed by the parsers - same format as parameters
      *
      * @param array $response
      */
@@ -636,6 +651,22 @@ class ApiDoc
     }
 
     /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
      * @param boolean $deprecated
      */
     public function setDeprecated($deprecated)
@@ -733,6 +764,10 @@ class ApiDoc
 
         if ($cache = $this->cache) {
             $data['cache'] = $cache;
+        }
+
+        if ($tags = $this->tags) {
+            $data['tags'] = $tags;
         }
 
         if ($requestDiscriminatorClasses = $this->requestDiscriminatorClasses) {
