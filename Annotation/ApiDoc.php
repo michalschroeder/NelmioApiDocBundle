@@ -803,6 +803,11 @@ class ApiDoc
      */
     private function exampleBodyFromArray($body)
     {
+        $currentDir = getcwd();
+        if (basename($currentDir) !== 'web') {
+            $body['file'] = str_replace('..' . DIRECTORY_SEPARATOR, '', $body['file']);
+        }
+
         if (!empty($body['file']) && is_readable($body['file'])) {
             return file_get_contents($body['file']);
         }
