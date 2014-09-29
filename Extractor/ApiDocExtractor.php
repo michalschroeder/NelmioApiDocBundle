@@ -418,13 +418,13 @@ class ApiDocExtractor
     protected function mergeParameters($p1, $p2)
     {
         $p1 = $this->parersMergeParametersIntersectKey($p1, $p2);
+        $p1 = (empty($p1)) ? $p2 : $p1;
 
         $params = $p1;
 
         foreach ($p2 as $propname => $propvalue) {
-            if (!isset($p1[$propname])) {
-                $params[$propname] = $propvalue;
-            } else {
+
+            if (isset($p1[$propname])) {
                 $v1 = $p1[$propname];
 
                 foreach ($propvalue as $name => $value) {
