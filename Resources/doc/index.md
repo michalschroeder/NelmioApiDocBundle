@@ -65,7 +65,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class YourController extends Controller
 {
     /**
-     * This the documentation description of your method, it will appear
+     * This is the documentation description of your method, it will appear
      * on a specific pane. It will read all the text until the first
      * annotation.
      *
@@ -96,6 +96,7 @@ class YourController extends Controller
     /**
      * @ApiDoc(
      *  description="Returns a collection of Object",
+     *  output="array<Your\Namespace\Class>"
      *  requirements={
      *      {
      *          "name"="limit",
@@ -127,7 +128,11 @@ The following properties are available:
 
 * `deprecated`: allow to set method as deprecated (default: `false`);
 
+* `tags`: allow to tag a method (e.g. `beta` or `in-development`). Either a single tag or an array of tags.
+
 * `filters`: an array of filters;
+
+* `headers`: an array of headers;
 
 * `requirements`: an array of requirements;
 
@@ -217,6 +222,9 @@ class YourController
 Each _filter_ has to define a `name` parameter, but other parameters are free. Filters are often optional
 parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
 
+Each _header_ has to define a `name` parameter, but other parameters are free. Headers are often optional
+parameters, and you can document them as you want, but keep in mind to be consistent for the whole documentation.
+
 If you set `input`, then the bundle automatically extracts parameters based on the given type,
 and determines for each parameter its data type, and if it's required or not.
 
@@ -295,11 +303,10 @@ documentation.
 
 #### Form Types Features
 
-If you use `FormFactoryInterface::createdNamed('', 'your_form_type'`, then by
-default the documentation will use the form type name as the prefix
+Even if you use `FormFactoryInterface::createNamed('', 'your_form_type')` the documentation will generate the form type name as the prefix for inputs
 (`your_form_type[param]` ... instead of just `param`).
 
-You can specify which prefix to use with the `name` key:
+You can specify which prefix to use with the `name` key in the `input` section:
 
 ```
 input = {
@@ -329,6 +336,72 @@ generate returned data.
 
 This feature also works for both the `input` and `output` properties.
 
+#### Discriminators
+
+You can use a JMS\Discriminator to define multiple input/output types. All available types will be displayed in
+documentation.
+
+The following example code will display two diffrent data types (User and Admin) for the GET /user action.
+
+```
+/**
+ * @ApiDoc(
+ *  output="Acme\Bundle\Entity\AbstractUser"
+ * )
+ */
+public function getUsersAction()
+{
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+use JMS\Serializer\Annotation as JMS;
+use JMS\Serializer\Annotation\Discriminator;
+
+/**
+ * @Discriminator(field = "type", map = {
+ *      "user": "Acme\Bundle\Entity\User",
+ *      "admin": "Acme\Bundle\Entity\Admin",
+ *  }
+ * })
+ */
+abstract class AbstractUser
+{
+    /**
+     * @JMS\Type("string");
+     */
+    public $userName;
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+class User extends AbstractUser
+{
+}
+```
+
+```
+<?php
+
+namespace Acme\Bundle\Entity;
+
+class Admin extends AbstractUser
+{
+    /**
+     * @JMS\Type("string");
+     */
+    public $extraField;
+}
+```
+
 ### Web Interface
 
 You can browse the whole documentation at: `http://example.org/api/doc`.
@@ -355,7 +428,10 @@ configure this sandbox using the following parameters:
 
                 name: access_token      # access token name or query parameter name or header name
 
-                delivery: query         # `query`, `http_basic`, and `header` are supported
+                delivery: http          # `query`, `http`, and `header` are supported
+
+                # Required if http delivery is selected.
+                type:     basic         # `basic`, `bearer` are supported
 
                 custom_endpoint: true   # default is `false`, if `true`, your user will be able to
                                         # specify its own endpoint
@@ -369,17 +445,24 @@ configure this sandbox using the following parameters:
             accept_type: application/json           # default is `~` (`null`), if set, the value is
                                                     # automatically populated as the `Accept` header
 
-            body_format: form                       # default is `form`, determines whether to send
+            body_format:
+                formats: [ form, json ]             # array of enabled body formats,
+                                                    # remove all elements to disable the selectbox
+                default_format: form                # default is `form`, determines whether to send
                                                     # `x-www-form-urlencoded` data or json-encoded
                                                     # data (by setting this parameter to `json`) in
                                                     # sandbox requests
 
             request_format:
-                method: format_param    # default `format_param`, alternately `accept_header`,
+                formats:                            # default is `json` and `xml`,
+                    json: application/json          # override to add custom formats or disable
+                    xml: application/xml            # the default formats
+
+                method: format_param    # default is `format_param`, alternately `accept_header`,
                                         # decides how to request the response format
 
-                default_format: json    # default `json`, alternately `xml`, determines which
-                                        # content format to request back by default
+                default_format: json    # default is `json`,
+                                        # default content format to request (see formats)
 
 ### Command
 
@@ -405,6 +488,29 @@ You can specify your own API name:
     # app/config/config.yml
     nelmio_api_doc:
         name: My API
+
+You can choose between different authentication methods:
+
+    # app/config/config.yml
+    nelmio_api_doc:
+        authentication:
+            delivery: header
+            name:     X-Custom
+
+    # app/config/config.yml
+    nelmio_api_doc:
+        authentication:
+            delivery: query
+            name:     param
+
+    # app/config/config.yml
+    nelmio_api_doc:
+        authentication:
+            delivery: http
+            type:     basic # or bearer
+
+When choosing an `http` delivery, `name` defaults to `Authorization`,
+and the header value will automatically be prefixed by the corresponding type (ie. `Basic` or `Bearer`).
 
 You can specify which sections to exclude from the documentation generation:
 
@@ -452,23 +558,37 @@ Look at the built-in [Handlers](https://github.com/nelmio/NelmioApiDocBundle/tre
 
 ``` yaml
 nelmio_api_doc:
-    name:                     API documentation
-    exclude_sections:         []
+    name:                 'API documentation'
+    exclude_sections:     []
     motd:
-        template:             NelmioApiDocBundle::Components/motd.html.twig
+        template:             'NelmioApiDocBundle::Components/motd.html.twig'
     request_listener:
         enabled:              true
         parameter:            _doc
     sandbox:
         enabled:              true
-        endpoint:             ~
-        accept_type:          ~
-        body_format:          form
+        endpoint:             null
+        accept_type:          null
+        body_format:
+            formats:
+
+                # Defaults:
+                - form
+                - json
+            default_format:       ~ # One of "form"; "json"
         request_format:
-            method:               format_param
+            formats:
+
+                # Defaults:
+                json:                application/json
+                xml:                 application/xml
+            method:               ~ # One of "format_param"; "accept_header"
             default_format:       json
         authentication:
-            name:                 ~ # Required
             delivery:             ~ # Required
+            name:                 ~ # Required
+
+            # Required if http delivery is selected.
+            type:                 ~ # One of "basic"; "bearer"
             custom_endpoint:      false
 ```

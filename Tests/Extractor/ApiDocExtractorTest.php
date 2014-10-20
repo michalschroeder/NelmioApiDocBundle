@@ -12,10 +12,11 @@
 namespace Nelmio\ApiDocBundle\Tests\Extractor;
 
 use Nelmio\ApiDocBundle\Tests\WebTestCase;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class ApiDocExtractorTest extends WebTestCase
 {
-    const ROUTES_QUANTITY = 24;
+    const ROUTES_QUANTITY = 27;
 
     public function testAll()
     {
@@ -41,36 +42,53 @@ class ApiDocExtractorTest extends WebTestCase
         $a1 = $data[0]['annotation'];
         $array1 = $a1->toArray();
         $this->assertTrue($a1->isResource());
-        $this->assertEquals('index action', $a1->getDescription());
-        $this->assertTrue(is_array($array1['filters']));
-        $this->assertNull($a1->getInput());
+        $this->assertEquals('Action with discriminator class in response', $a1->getDescription());
+        $this->assertTrue(is_array($array1['responseDiscriminatorClasses']));
+        $this->assertTrue(is_array($array1['responseDiscriminatorClasses']['DiscriminatorClass']));
+        $this->assertCount(3, $array1['responseDiscriminatorClasses']['DiscriminatorClass']);
 
         $a1 = $data[1]['annotation'];
+        $array1 = $a1->toArray();
+        $this->assertTrue($a1->isResource());
+        $this->assertEquals('Action with discriminator class in request params', $a1->getDescription());
+        $this->assertTrue(is_array($array1['requestDiscriminatorClasses']));
+        $this->assertTrue(is_array($array1['requestDiscriminatorClasses']['DiscriminatorClass']));
+        $this->assertCount(3, $array1['requestDiscriminatorClasses']['DiscriminatorClass']);
+
+        $a1 = $data[2]['annotation'];
         $array1 = $a1->toArray();
         $this->assertTrue($a1->isResource());
         $this->assertEquals('index action', $a1->getDescription());
         $this->assertTrue(is_array($array1['filters']));
         $this->assertNull($a1->getInput());
 
-        $a2 = $data[2]['annotation'];
+        $a1 = $data[3]['annotation'];
+        $array1 = $a1->toArray();
+        $this->assertTrue($a1->isResource());
+        $this->assertEquals('index action', $a1->getDescription());
+        $this->assertTrue(is_array($array1['filters']));
+        $this->assertNull($a1->getInput());
+
+        $a2 = $data[4]['annotation'];
+        $array2 = $a2->toArray();
+        $this->assertFalse($a2->isResource());
+        $this->assertEquals('create test', $a2->getDescription());
+        $this->assertFalse(isset($array2['filters']));
+        $this->assertFalse(isset($array2['headers']));
+        $this->assertEquals('Nelmio\ApiDocBundle\Tests\Fixtures\Form\TestType', $a2->getInput());
+
+        $a2 = $data[5]['annotation'];
         $array2 = $a2->toArray();
         $this->assertFalse($a2->isResource());
         $this->assertEquals('create test', $a2->getDescription());
         $this->assertFalse(isset($array2['filters']));
         $this->assertEquals('Nelmio\ApiDocBundle\Tests\Fixtures\Form\TestType', $a2->getInput());
 
-        $a2 = $data[3]['annotation'];
-        $array2 = $a2->toArray();
-        $this->assertFalse($a2->isResource());
-        $this->assertEquals('create test', $a2->getDescription());
-        $this->assertFalse(isset($array2['filters']));
-        $this->assertEquals('Nelmio\ApiDocBundle\Tests\Fixtures\Form\TestType', $a2->getInput());
-
-        $a4 = $data[5]['annotation'];
+        $a4 = $data[7]['annotation'];
         $this->assertTrue($a4->isResource());
         $this->assertEquals('TestResource', $a4->getResource());
 
-        $a3 = $data['14']['annotation'];
+        $a3 = $data['16']['annotation'];
         $this->assertTrue($a3->getHttps());
 
     }
@@ -90,7 +108,7 @@ class ApiDocExtractorTest extends WebTestCase
         $this->assertTrue(is_array($array['filters']));
         $this->assertNull($annotation->getInput());
 
-        $annotation2 = $extractor->get('nemlio.test.controller:indexAction', 'test_service_route_1');
+        $annotation2 = $extractor->get('nelmio.test.controller:indexAction', 'test_service_route_1');
         $annotation2->getRoute()
             ->setDefault('_controller', $annotation->getRoute()->getDefault('_controller'))
             ->compile(); // compile as we changed a default value
@@ -118,7 +136,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller:indexAction', 'invalid_route');
+        $data = $extractor->get('nelmio.test.controller:indexAction', 'invalid_route');
 
         $this->assertNull($data);
     }
@@ -131,7 +149,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller', 'test_service_route_1');
+        $data = $extractor->get('nelmio.test.controller', 'test_service_route_1');
 
         $this->assertNull($data);
     }
@@ -144,7 +162,7 @@ class ApiDocExtractorTest extends WebTestCase
 
         $this->assertNull($data);
 
-        $data = $extractor->get('nemlio.test.controller:anotherAction', 'test_service_route_1');
+        $data = $extractor->get('nelmio.test.controller:anotherAction', 'test_service_route_1');
 
         $this->assertNull($data);
     }
@@ -153,12 +171,19 @@ class ApiDocExtractorTest extends WebTestCase
     {
         $container  = $this->getContainer();
         $extractor  = $container->get('nelmio_api_doc.extractor.api_doc_extractor');
+        /** @var ApiDoc $annotation */
         $annotation = $extractor->get('Nelmio\ApiDocBundle\Tests\Fixtures\Controller\TestController::myCommentedAction', 'test_route_5');
 
         $this->assertNotNull($annotation);
         $this->assertEquals(
             "This method is useful to test if the getDocComment works.",
             $annotation->getDescription()
+        );
+
+        $this->assertEquals(
+            "This method is useful to test if the getDocComment works." . PHP_EOL .
+            "And, it supports multilines until the first '@' char.",
+            $annotation->getDocumentation()
         );
 
         $data = $annotation->toArray();
